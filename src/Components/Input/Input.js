@@ -12,8 +12,7 @@ const StyledInput = styled.input`
   height: 30px;
   width: 100%;
   box-sizing: content-box;
-  border-radius: 0;
-  margin-right: 4px;
+  border-radius: 4px;
   margin-bottom: 10px;
   border: 1px solid ${Colors.DARK};
 `;
@@ -21,7 +20,7 @@ const Label = styled.label`
   font-size: 1rem;
   font-weight: 700;
   position: absolute;
-  top: -16px;
+  top: -2rem;
   left: 0;
 `;
 
@@ -33,14 +32,18 @@ const Input = ({
   placeholder,
   width,
   disabled,
+  style,
+  type,
 }) => (
-  <InputContainer width={width} className={className}>
+  <InputContainer width={width} className={`${className} inputContainer`}>
     {label && <Label>{label}</Label>}
     <StyledInput
       value={value}
       placeholder={placeholder}
       onChange={({ target }) => onChange(target.value)}
       disabled={disabled}
+      style={style}
+      type={type}
     />
   </InputContainer>
 );
@@ -53,6 +56,8 @@ Input.propTypes = {
   onChange: PropTypes.func,
   placeholder: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   disabled: PropTypes.bool,
+  style: PropTypes.any,
+  type: PropTypes.string,
 };
 Input.defaultProps = {
   className: "",
@@ -61,6 +66,8 @@ Input.defaultProps = {
   value: "",
   onChange: () => {},
   placeholder: "Enter Value",
+  style: {},
+  type: "text",
 };
 
 export default Input;

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Colors } from "consts";
 
 const Container = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -21,7 +21,7 @@ const SelectContainer = styled.div`
 `;
 const StyledSelect = styled.select`
   width: 100%;
-  padding: 14px 18px;
+  padding: 11px 18px;
   border-radius: 4px;
   margin: 0;
   border: 1px solid ${Colors.DARK};
@@ -55,8 +55,10 @@ const DropdownIcon = styled.div`
 const Label = styled.label`
   margin-bottom: 16px;
   font-weight: bold;
-  font-size: 1.8rem;
   display: inline-block;
+  position: absolute;
+  left: 0;
+  top: -2rem;
   color: #333333;
 `;
 
@@ -67,6 +69,7 @@ const Dropdown = ({
   name,
   value: initialValue,
   onChange,
+  disabled,
 }) => {
   const renderOptions = () =>
     options.map((title, index) => (
@@ -76,13 +79,14 @@ const Dropdown = ({
     ));
 
   return (
-    <Container className={className}>
-      {label && <Label htmlFor={name}>{label}</Label>}
+    <Container className={`${className}`}>
       <Group>
-        <SelectContainer>
+        <SelectContainer className="inputContainer">
+          {label && <Label htmlFor={name}>{label}</Label>}
           <StyledSelect
             value={initialValue || options[0]}
             onChange={({ target }) => onChange(target.value)}
+            disabled={disabled}
           >
             {renderOptions()}
           </StyledSelect>
@@ -100,11 +104,13 @@ Dropdown.propTypes = {
   value: PropTypes.node,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
 };
 Dropdown.defaultProps = {
   className: "",
   label: "",
   value: null,
+  disabled: false,
 };
 
 export default Dropdown;

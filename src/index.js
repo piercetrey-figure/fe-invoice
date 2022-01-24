@@ -6,6 +6,9 @@ import { App } from "./App";
 // Bring in Google Fonts and base styles
 import "./base.css";
 import { GRPC_URL, NETWORK, WALLET_URL } from "./consts/network";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+const queryClient = new QueryClient();
 
 ReactDOM.render(
   <StrictMode>
@@ -14,7 +17,9 @@ ReactDOM.render(
         grpcServiceAddress={GRPC_URL}
         walletUrl={WALLET_URL}
       >
-        <App />
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
       </WalletContextProvider>
     </WalletConnectContextProvider>
   </StrictMode>,

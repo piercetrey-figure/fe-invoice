@@ -4,6 +4,7 @@ import {
   QRCodeModal,
   WINDOW_MESSAGES as WINDOW_MESSAGE,
 } from "@provenanceio/walletconnect-js";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import styled from "styled-components";
 import { Connect, Disconnect, Popup } from "Components";
 import { ROOT_NAME } from "consts";
@@ -15,23 +16,14 @@ import { ConversionUtil } from "./util/ConversionUtil";
 import { TabContainer } from "Components/Tabs";
 import AddressLink from "Components/AddressLink";
 import { BigParagraph } from "Components/Display";
+import { SidebarLayout, SidebarLink } from "./Components/Layout/Sidebar";
+import { ListInvoices } from "./Components/Pages/List/ListInvoices";
+import { CreateInvoice } from "./Components/Pages/Create/CreateInvoice";
 
 const Wrapper = styled.div`
   background: ${PRIMARY_BACKGROUND};
-
-  a {
-    color: ${TEXT_ACCENT};
-    &:hover {
-      color: ${TEXT};
-    }
-  }
 `;
 const HomeContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  align-items: center;
-  /* justify-content: center; */
   max-width: 100%;
   min-height: 100vh;
   position: relative;
@@ -82,57 +74,73 @@ export const App = () => {
   }, [address]);
 
   useEffect(() => {
-    if (!listenersAdded) {
-      console.log("Adding event listeners");
-      setListenersAdded(true);
-      wcs.addListener(WINDOW_MESSAGE.CUSTOM_ACTION_COMPLETE, (result) => {
-        console.log(
-          `WalletConnectJS | Custom Action Complete | Result: `,
-          result
-        );
-      });
+    setListenersAdded(true);
+    wcs.addListener(WINDOW_MESSAGE.CUSTOM_ACTION_COMPLETE, (result) => {
+      console.log(
+        `WalletConnectJS | Custom Action Complete | Result: `,
+        result
+      );
+    });
 
-      wcs.addListener(WINDOW_MESSAGE.CUSTOM_ACTION_FAILED, (result) => {
-        const { error } = result;
-        console.log(
-          `WalletConnectJS | Custom Action Failed | result, error: `,
-          result,
-          error
-        );
-      });
-    }
-  }, [listenersAdded]);
+    wcs.addListener(WINDOW_MESSAGE.CUSTOM_ACTION_FAILED, (result) => {
+      const { error } = result;
+      console.log(
+        `WalletConnectJS | Custom Action Failed | result, error: `,
+        result,
+        error
+      );
+    });
+  }, []);
 
   return (
     <Wrapper>
       <HomeContainer>
-        {popupContent && (
-          <Popup
-            delay={popupDuration}
-            onClose={() => setPopupContent("")}
-            status={popupStatus}
-          >
-            {popupContent}
-          </Popup>
-        )}
-        <Header>InVoice</Header>
-        <Content>
-          {connected ? (
-            <>
-              <Disconnect walletConnectService={wcs} setPopup={setPopup} />
-            </>
-          ) : (
-            <Connect walletConnectService={wcs} setPopup={setPopup} />
+        <Router basename="fe-invoice">
+          {popupContent && (
+            <Popup
+              delay={popupDuration}
+              onClose={() => setPopupContent("")}
+              status={popupStatus}
+            >
+              {popupContent}
+            </Popup>
           )}
-        </Content>
-        <QRCodeModal
-          walletConnectService={wcs}
-          walletConnectState={walletConnectState}
-          title="Scan to initiate walletConnect-js session"
-        />
-        <div>
-          WalletConnect-JS Version: {REACT_APP_WCJS_VERSION || "??.??.??"}
-        </div>
+          <SidebarLayout
+            sidebarContent={
+              <>
+                <Header>InVoice</Header>
+                {connected ? (
+                  <>
+                    <SidebarLink to="/">My Invoices</SidebarLink>
+                    <SidebarLink to="/create">Create Invoice</SidebarLink>
+                    <Disconnect
+                      walletConnectService={wcs}
+                      setPopup={setPopup}
+                    />
+                  </>
+                ) : (
+                  <Connect walletConnectService={wcs} setPopup={setPopup} />
+                )}
+              </>
+            }
+          >
+            {connected && (
+              <Routes>
+                <Route path="/" element={<ListInvoices />} />
+                <Route path="/create" element={<CreateInvoice />} />
+                <Route path="*" element={<ListInvoices />} />
+              </Routes>
+            )}
+          </SidebarLayout>
+          <QRCodeModal
+            walletConnectService={wcs}
+            walletConnectState={walletConnectState}
+            title="Scan to initiate walletConnect-js session"
+          />
+          <div>
+            WalletConnect-JS Version: {REACT_APP_WCJS_VERSION || "??.??.??"}
+          </div>
+        </Router>
       </HomeContainer>
     </Wrapper>
   );

@@ -1,18 +1,19 @@
-import styled from 'styled-components';
-import PropTypes from 'prop-types';
-import { Loading } from 'Components';
+import styled, { css } from "styled-components";
+import PropTypes from "prop-types";
+import { Loading } from "Components";
 
 const StyledButton = styled.button`
-  flex-basis: ${({ width }) => width };
-  ${({ width }) => width === 'auto' && 'min-width: 150px' };
+  flex-basis: ${({ width }) => width};
+  width: ${({ width }) => width};
+  ${({ width }) => width === "auto" && "min-width: 150px"};
   align-items: center;
-  background: ${({ color }) => color };
+  background: ${({ backgroundColor }) => backgroundColor};
   white-space: nowrap;
   border-radius: 6px;
-  border: 1px solid ${({ color }) => color };
-  text-shadow: 0 1px 0px rgba(0, 0, 0, 0.5), 0 -1px 0px rgba(0, 0, 0, 0.5), 1px 0 0px rgba(0, 0, 0, 0.5), -1px 0 0px rgba(0, 0, 0, 0.5);
-  color: white;
-  cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer' };
+  border: 1px solid
+    ${({ borderColor, backgroundColor }) => borderColor || backgroundColor};
+  color: ${({ color }) => color};
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   display: flex;
   justify-content: center;
   letter-spacing: 0.07rem;
@@ -23,6 +24,12 @@ const StyledButton = styled.button`
   padding: 0 30px;
   &:hover:not(:disabled) {
     filter: contrast(200%);
+    ${({ secondary, color, backgroundColor }) =>
+      secondary &&
+      css`
+        background-color: ${color};
+        color: ${backgroundColor};
+      `}
   }
   &:active:not(:disabled) {
     filter: contrast(90%);
@@ -33,11 +40,32 @@ const StyledButton = styled.button`
 `;
 const ButtonContent = styled.div``;
 
-const Button = ({ className, color, onClick, children, disabled, width, title, type, loading }) => {
+const Button = ({
+  className,
+  backgroundColor,
+  onClick,
+  children,
+  disabled,
+  width,
+  title,
+  type,
+  loading,
+  borderColor,
+  color,
+  secondary,
+}) => {
   const handleClick = () => {
     if (!disabled) {
       onClick();
     }
+  };
+
+  if (secondary) {
+    [color, backgroundColor, borderColor] = [
+      backgroundColor,
+      color,
+      backgroundColor,
+    ];
   }
 
   return (
@@ -45,9 +73,12 @@ const Button = ({ className, color, onClick, children, disabled, width, title, t
       title={title}
       className={className}
       onClick={handleClick}
-      color={color.toUpperCase()}
+      color={color}
+      secondary={secondary}
+      backgroundColor={backgroundColor.toUpperCase()}
+      borderColor={(borderColor || backgroundColor).toUpperCase()}
       onKeyPress={(e) => {
-        if (e.key === 'Enter') {
+        if (e.key === "Enter") {
           handleClick();
         }
       }}
@@ -62,7 +93,7 @@ const Button = ({ className, color, onClick, children, disabled, width, title, t
 
 Button.propTypes = {
   className: PropTypes.string,
-  color: PropTypes.string,
+  backgroundColor: PropTypes.string,
   onClick: PropTypes.func,
   children: PropTypes.node.isRequired,
   disabled: PropTypes.bool,
@@ -70,16 +101,21 @@ Button.propTypes = {
   width: PropTypes.string,
   title: PropTypes.string,
   type: PropTypes.string,
+  borderColor: PropTypes.string,
+  color: PropTypes.string,
+  secondary: PropTypes.bool,
 };
 Button.defaultProps = {
-  className: '',
-  color: '#42368E',
+  className: "",
+  backgroundColor: "#42368E",
   onClick: () => {},
   disabled: false,
-  width: 'auto',
-  title: '',
-  type: 'button',
+  width: "auto",
+  title: "",
+  type: "button",
   loading: false,
+  color: "white",
+  secondary: false,
 };
 
 export default Button;
