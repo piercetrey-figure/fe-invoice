@@ -4,17 +4,10 @@ import Dropdown from '../Dropdown/Dropdown';
 
 interface VendorSelectorProps {
     disabled?: boolean,
-    onChange: (vendor: string) => any,
 }
 
-export const VendorSelector: FunctionComponent<VendorSelectorProps> = ({ disabled, onChange }) => {
-    const [selected, setSelected] = useState('')
+export const VendorSelector: FunctionComponent<VendorSelectorProps> = ({ disabled }) => {
     const { data: vendors, isLoading } = useVendors()
-
-    const handleChange = (v: string) => {
-        setSelected(v)
-        onChange(v)
-    }
 
     if (isLoading) {
         return <div>Loading...</div>
@@ -24,5 +17,5 @@ export const VendorSelector: FunctionComponent<VendorSelectorProps> = ({ disable
         return <div>Error fetching vendors</div>
     }
 
-    return <Dropdown disabled={disabled === true} name="vendor" label="Vendor" options={['Select a Vendor...', ...vendors]} value={selected} onChange={handleChange} />
+    return <Dropdown disabled={disabled === true} name="vendor" label="Vendor" options={['Select a Vendor...', ...vendors]} />
 }

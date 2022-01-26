@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Colors } from "consts";
+import { useFormContext } from "react-hook-form";
 
 const InputContainer = styled.div`
   position: relative;
@@ -34,19 +35,24 @@ const Input = ({
   disabled,
   style,
   type,
-}) => (
-  <InputContainer width={width} className={`${className} inputContainer`}>
-    {label && <Label>{label}</Label>}
-    <StyledInput
-      value={value}
-      placeholder={placeholder}
-      onChange={({ target }) => onChange(target.value)}
-      disabled={disabled}
-      style={style}
-      type={type}
-    />
-  </InputContainer>
-);
+  name,
+}) => {
+  const { register } = useFormContext();
+
+  return (
+    <InputContainer width={width} className={`${className} inputContainer`}>
+      {label && <Label>{label}</Label>}
+      <StyledInput
+        placeholder={placeholder}
+        onChange={({ target }) => onChange(target.value)}
+        disabled={disabled}
+        style={style}
+        type={type}
+        {...register(name)}
+      />
+    </InputContainer>
+  );
+};
 
 Input.propTypes = {
   className: PropTypes.string,
@@ -58,6 +64,7 @@ Input.propTypes = {
   disabled: PropTypes.bool,
   style: PropTypes.any,
   type: PropTypes.string,
+  name: PropTypes.string,
 };
 Input.defaultProps = {
   className: "",

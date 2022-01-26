@@ -6,3 +6,5 @@ export const GRPC_URL = PRODUCTION ? 'https://wallet.provenance.io/proxy' : 'htt
 export const WALLET_URL = PRODUCTION ? 'https://wallet.provenance.io' : 'https://wallet.test.provenance.io'
 export const ROOT_NAME = 'wallettest3.pb'
 export const FEE_DENOM = 'nhash'
+
+export const BASE_URL = 'http://localhost:13459/service-invoice/v1'

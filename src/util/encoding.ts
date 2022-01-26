@@ -1,0 +1,1 @@
+export const urlSafeBase64ToBase64 = (value: string) => value.replace(/_/g, '/').replace(/-/g, '+')

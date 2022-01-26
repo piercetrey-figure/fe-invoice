@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Colors } from "consts";
+import { useFormContext } from "react-hook-form";
 
 const Container = styled.div`
   margin-bottom: 10px;
@@ -67,7 +68,7 @@ const Dropdown = ({
   label,
   options,
   name,
-  value: initialValue,
+  value,
   onChange,
   disabled,
 }) => {
@@ -78,13 +79,15 @@ const Dropdown = ({
       </option>
     ));
 
+  const { register } = useFormContext();
+
   return (
     <Container className={`${className}`}>
       <Group>
         <SelectContainer className="inputContainer">
           {label && <Label htmlFor={name}>{label}</Label>}
           <StyledSelect
-            value={initialValue || options[0]}
+            {...register(name)}
             onChange={({ target }) => onChange(target.value)}
             disabled={disabled}
           >
@@ -103,7 +106,7 @@ Dropdown.propTypes = {
   options: PropTypes.array.isRequired,
   value: PropTypes.node,
   name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   disabled: PropTypes.bool,
 };
 Dropdown.defaultProps = {
@@ -111,6 +114,7 @@ Dropdown.defaultProps = {
   label: "",
   value: null,
   disabled: false,
+  onChange: () => {},
 };
 
 export default Dropdown;

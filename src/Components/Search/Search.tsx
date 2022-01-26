@@ -1,4 +1,5 @@
 import { FunctionComponent } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import styled from "styled-components";
 import Input from '../Input/Input';
 
@@ -15,5 +16,8 @@ export interface SearchProps {
 }
 
 export const Search: FunctionComponent<SearchProps> = ({ maxWidth }) => {
-    return <SearchInput disabled={false} maxWidth={maxWidth} placeholder="Search"></SearchInput>
+    const formMethods = useForm()
+    return <FormProvider {...formMethods}>
+        <SearchInput disabled={false} maxWidth={maxWidth} placeholder="Search" name="search" />
+    </FormProvider>
 }
