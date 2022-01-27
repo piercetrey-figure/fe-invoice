@@ -5,13 +5,10 @@ import { Button } from 'Components';
 import { Invoice } from "../../../proto/invoice_protos_pb";
 import styled from "styled-components";
 import { TitleHeader } from "../../Headers";
-import { formatter } from "../../../util";
+import { calculateTotal, formatter, invoiceTotal } from "../../../util";
 import { Search } from "../../Search";
 import { Colors } from 'consts';
 import { useNavigate } from 'react-router-dom'
-
-const invoiceTotal = (invoice: Invoice) => invoice?.getLineItemsList().reduce((acc, item) => acc + +(item?.getPrice()?.getValue() || 0) * item.getQuantity(), 0)
-const calculateTotal = (invoices: Invoice[]) => invoices.reduce((acc, invoice) => acc + invoiceTotal(invoice), 0)
 
 interface TotalDetailsProps {
 
@@ -52,12 +49,16 @@ const InvoiceRowWrapper = styled.div`
     }
 `
 
-const InvoiceRow: FunctionComponent<InvoiceRowProps> = ({ invoice }) => <InvoiceRowWrapper>
-    <TableElement>{invoice.getToAddress()}</TableElement>
-    <TableElement>{invoiceTotal(invoice)}</TableElement>
-    {/* <TableElement><Button color={Colors.ACTION} backgroundColor="transparent" borderColor={Colors.ACTION}>Details</Button></TableElement> */}
-    <TableElement><Button secondary>Details</Button></TableElement>
-</InvoiceRowWrapper>
+const InvoiceRow: FunctionComponent<InvoiceRowProps> = ({ invoice }) => {
+    const navigate = useNavigate()
+
+    return <InvoiceRowWrapper>
+        <TableElement>{invoice.getToAddress()}</TableElement>
+        <TableElement>{invoiceTotal(invoice)}</TableElement>
+        {/* <TableElement><Button color={Colors.ACTION} backgroundColor="transparent" borderColor={Colors.ACTION}>Details</Button></TableElement> */}
+        <TableElement><Button secondary onClick={() => navigate(`/${invoice.getInvoiceUuid()?.getValue()}`)}>Details</Button></TableElement>
+    </InvoiceRowWrapper>
+}
 
 const InvoiceHeaderWrapper = styled(InvoiceRowWrapper)`
     border-top: none;

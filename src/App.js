@@ -19,6 +19,7 @@ import { BigParagraph } from "Components/Display";
 import { SidebarLayout, SidebarLink } from "./Components/Layout/Sidebar";
 import { ListInvoices } from "./Components/Pages/List/ListInvoices";
 import { CreateInvoice } from "./Components/Pages/Create/CreateInvoice";
+import { InvoiceDetails } from "Components/Pages/Details";
 
 const Wrapper = styled.div`
   background: ${PRIMARY_BACKGROUND};
@@ -128,6 +129,7 @@ export const App = () => {
               <Routes>
                 <Route path="/" element={<ListInvoices />} />
                 <Route path="/create" element={<CreateInvoice />} />
+                <Route path="/:uuid" element={<InvoiceDetails />} />
                 <Route path="*" element={<ListInvoices />} />
               </Routes>
             )}
