@@ -67,7 +67,7 @@ export const MultiMessageStepModal: FunctionComponent<MultiMessageStepModalProps
         (async () => {
             for (const message of messages) {
                 await handleSign(message)
-                setCurrent(c => c + 1)
+                setCurrent(c => Math.min(c + 1, messages.length - 1))
             }
             navigate(redirect)
         })()

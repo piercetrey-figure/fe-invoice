@@ -12,13 +12,16 @@ import { addDays, format, parse } from 'date-fns'
 import { newDate, newInvoice, newLineItem, newRandomUuid, newDecimal, decodeB64 } from "../../../util";
 import { ErrorBar } from "../../Error/ErrorBar";
 import { SubmittingOverlay } from "../../Submitting/SubmittingOverlay";
-import { useCreateInvoice } from "../../../hooks/useCreateInvoice";
+import { CreateInvoiceResponse, useCreateInvoice } from "../../../hooks/useCreateInvoice";
 import { InvoiceLineItem } from "./InvoiceLineItem";
 import styled from "styled-components";
 import { useForm, FormProvider } from 'react-hook-form'
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { MultiMessageStepModal, parseSignMessage, SignMessage } from "Components/MultiMessageStepModal";
 import { MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest } from '@provenanceio/wallet-lib/lib/proto/provenance/metadata/v1/tx_pb'
+import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb';
+import { InvoiceContractService } from "Services";
+import { ROOT_PAYABLE_NAME } from "consts";
 
 interface TermsSelectorProps {
     value?: string,
@@ -35,7 +38,6 @@ const TermsSelector: FunctionComponent<TermsSelectorProps> = ({ value, disabled 
 const LineItemWrapper = styled.div`
     margin-bottom: 20px;
 `
-
 interface CreateInvoiceProps {
     
 }
@@ -108,7 +110,10 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
                 
             const createResult = await onCreate(invoice)
 
+            const invoiceContractService = new InvoiceContractService(ROOT_PAYABLE_NAME)
+
             setMessages([
+                parseSignMessage({typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: await invoiceContractService.generateCreateInvoiceBase64Message(createResult.markerCreationDetail, address)}, MsgExecuteContract.deserializeBinary),
                 parseSignMessage(createResult.scopeGenerationDetail.writeScopeRequest, MsgWriteScopeRequest.deserializeBinary),
                 parseSignMessage(createResult.scopeGenerationDetail.writeSessionRequest, MsgWriteSessionRequest.deserializeBinary),
                 parseSignMessage(createResult.scopeGenerationDetail.writeRecordRequest, MsgWriteRecordRequest.deserializeBinary),
