@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Invoice, LineItem } from "../../../proto/invoice_protos_pb";
 import { Date as DateProto } from "../../../proto/util_protos_pb";
 import { addDays, format, parse } from 'date-fns'
-import { newDate, newInvoice, newLineItem, newRandomUuid, newDecimal } from "../../../util";
+import { newDate, newInvoice, newLineItem, newRandomUuid, newDecimal, decodeB64 } from "../../../util";
 import { ErrorBar } from "../../Error/ErrorBar";
 import { SubmittingOverlay } from "../../Submitting/SubmittingOverlay";
 import { useCreateInvoice } from "../../../hooks/useCreateInvoice";
@@ -17,7 +17,8 @@ import { InvoiceLineItem } from "./InvoiceLineItem";
 import styled from "styled-components";
 import { useForm, FormProvider } from 'react-hook-form'
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
-import { MultiMessageStepModal, SignMessage } from "Components/MultiMessageStepModal";
+import { MultiMessageStepModal, parseSignMessage, SignMessage } from "Components/MultiMessageStepModal";
+import { MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest } from '@provenanceio/wallet-lib/lib/proto/provenance/metadata/v1/tx_pb'
 
 interface TermsSelectorProps {
     value?: string,
@@ -108,9 +109,9 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
             const createResult = await onCreate(invoice)
 
             setMessages([
-                {proto: createResult.writeScopeRequest, anyProto: createResult.writeScopeRequestAny},
-                {proto: createResult.writeSessionRequest, anyProto: createResult.writeSessionRequestAny},
-                {proto: createResult.writeRecordRequest, anyProto: createResult.writeRecordRequestAny},
+                parseSignMessage(createResult.scopeGenerationDetail.writeScopeRequest, MsgWriteScopeRequest.deserializeBinary),
+                parseSignMessage(createResult.scopeGenerationDetail.writeSessionRequest, MsgWriteSessionRequest.deserializeBinary),
+                parseSignMessage(createResult.scopeGenerationDetail.writeRecordRequest, MsgWriteRecordRequest.deserializeBinary),
             ])
             setRedirect(`/invoices/${invoice?.getInvoiceUuid()?.getValue()}`)
 

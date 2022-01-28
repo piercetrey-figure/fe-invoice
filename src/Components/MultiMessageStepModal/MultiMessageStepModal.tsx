@@ -5,6 +5,8 @@ import styled from "styled-components";
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { useNavigate } from "react-router-dom";
 import { Any } from '@provenanceio/wallet-lib/lib/proto/google/protobuf/any_pb';
+import { Message } from 'google-protobuf'
+import { decodeB64 } from "../../util";
 
 const Wrapper = styled.div`
     position: fixed;
@@ -33,6 +35,13 @@ const Body = styled.div`
 export interface SignMessage {
     proto: any,
     anyProto: any
+}
+
+export function parseSignMessage<T extends Message>(anyProto: any, deserializer: (b: Buffer) => T): SignMessage {
+    return {
+        proto: deserializer(decodeB64(anyProto.value)).toObject(),
+        anyProto
+    }
 }
 
 export interface MultiMessageStepModalProps {
@@ -67,7 +76,7 @@ export const MultiMessageStepModal: FunctionComponent<MultiMessageStepModalProps
     return <Wrapper>
         <Body>
             <Header>Sign Message ({current + 1} / {messages.length})</Header>
-            <pre>{JSON.stringify(messages[current], null, 2)}</pre>
+            <pre>{JSON.stringify(messages[current].proto, null, 2)}</pre>
             <SubHeader>Please Check Your Device for Signature Prompt</SubHeader>
         </Body>
     </Wrapper>

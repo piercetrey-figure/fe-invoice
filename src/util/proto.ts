@@ -12,7 +12,8 @@ export const newRandomUuid = () => newUuid().setValue(uuidv4())
 export const newDate = (date: Date = new Date()) => new DateProto().setValue(format(date, PROTO_DATE_FORMAT));
 export const newDecimal = (value: number | string = 0) => new Decimal().setValue(value.toString());
 
-export const toInvoice = (b64: string) => Invoice.deserializeBinary(Buffer.from(b64, 'base64'))
+export const decodeB64 = (b64: string) => Buffer.from(b64, 'base64')
+export const toInvoice = (b64: string) => Invoice.deserializeBinary(decodeB64(b64))
 
 export const lineItemPrice = (lineItem: LineItem) => +(lineItem?.getPrice()?.getValue() || 0)
 export const lineItemTotal = (lineItem: LineItem) => lineItemPrice(lineItem) * lineItem.getQuantity()

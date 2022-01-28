@@ -5,12 +5,18 @@ import { urlSafeBase64ToBase64 } from "../util"
 
 export interface CreateInvoiceResponse {
     invoice: any,
-    writeScopeRequest: any,
-    writeScopeRequestAny: any,
-    writeSessionRequest: any,
-    writeSessionRequestAny: any,
-    writeRecordRequest: any,
-    writeRecordRequestAny: any,
+    markerCreationDetail: {
+        markerDenom: string,
+        markerAddress: string,
+        scopeId: string,
+        invoiceDenom: string,
+        invoiceTotal: any, // todo: determine structure
+    },
+    scopeGenerationDetail: {
+        writeScopeRequest: any,
+        writeSessionRequest: any,
+        writeRecordRequest: any,
+    }
 }
 
 export const useCreateInvoice = () => {
