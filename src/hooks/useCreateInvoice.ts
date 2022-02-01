@@ -3,9 +3,8 @@ import { Invoice } from "../proto/invoice_protos_pb"
 import { useWalletConnect } from '@provenanceio/walletconnect-js'
 import { urlSafeBase64ToBase64 } from "../util"
 
-export interface MarkerCreationDetail {
-    markerDenom: string,
-    markerAddress: string,
+export interface PayablesContractExecutionDetail {
+    payableUuid: string,
     scopeId: string,
     invoiceDenom: string,
     invoiceTotal: number,
@@ -13,7 +12,7 @@ export interface MarkerCreationDetail {
 
 export interface CreateInvoiceResponse {
     invoice: any,
-    markerCreationDetail: MarkerCreationDetail,
+    payablesContractExecutionDetail: PayablesContractExecutionDetail,
     scopeGenerationDetail: {
         writeScopeRequest: any,
         writeSessionRequest: any,

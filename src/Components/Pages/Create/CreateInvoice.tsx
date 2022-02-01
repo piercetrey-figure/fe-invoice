@@ -117,10 +117,10 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
             const invoiceContractService = new InvoiceContractService(ROOT_PAYABLE_NAME)
 
             setMessages([
-                parseSignMessage({typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: await invoiceContractService.generateCreateInvoiceBase64Message(createResult.markerCreationDetail, address)}, MsgExecuteContract.deserializeBinary),
                 parseSignMessage(createResult.scopeGenerationDetail.writeScopeRequest, MsgWriteScopeRequest.deserializeBinary),
                 parseSignMessage(createResult.scopeGenerationDetail.writeSessionRequest, MsgWriteSessionRequest.deserializeBinary),
                 parseSignMessage(createResult.scopeGenerationDetail.writeRecordRequest, MsgWriteRecordRequest.deserializeBinary),
+                parseSignMessage({typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: await invoiceContractService.generateCreateInvoiceBase64Message(createResult.payablesContractExecutionDetail, address)}, MsgExecuteContract.deserializeBinary),
             ])
             setRedirect(`/invoices/${invoice?.getInvoiceUuid()?.getValue()}`)
 

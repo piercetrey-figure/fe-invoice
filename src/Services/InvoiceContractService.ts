@@ -2,9 +2,9 @@ import { WasmService } from 'Services';
 import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb'
 import { Coin } from '@provenanceio/wallet-lib/lib/proto/cosmos/base/v1beta1/coin_pb'
 import { Any } from '@provenanceio/wallet-lib/lib/proto/google/protobuf/any_pb'
-import { QueryInvoiceSettings, QueryInvoiceSettingsResponse, RegisterPayableMarker } from '../models';
+import { QueryInvoiceSettings, QueryInvoiceSettingsResponse, RegisterPayable } from '../models';
 import { FEE_DENOM } from 'consts';
-import { MarkerCreationDetail } from 'hooks';
+import { PayablesContractExecutionDetail } from 'hooks';
 
 export class InvoiceContractService {
     wasmService = new WasmService()
@@ -27,18 +27,17 @@ export class InvoiceContractService {
         return this.wasmService.queryWasmCustom<QueryInvoiceSettings, QueryInvoiceSettingsResponse>(await this.getContractAddress(), new QueryInvoiceSettings())
     }
 
-    async generateCreateInvoiceBase64Message(markerDetail: MarkerCreationDetail, address: string): Promise<string> {
+    async generateCreateInvoiceBase64Message(contractDetail: PayablesContractExecutionDetail, address: string): Promise<string> {
         const [contractAddr, contractConfig] = await Promise.all([
             this.getContractAddress(),
             this.getContractConfig()
         ])
         const message = new MsgExecuteContract()
-            .setMsg(Buffer.from(new RegisterPayableMarker()
-                .setMarkerAddress(markerDetail.markerAddress)
-                .setMarkerDenom(markerDetail.markerDenom)
-                .setScopeId(markerDetail.scopeId)
-                .setPayableDenom(markerDetail.invoiceDenom)
-                .setPayableTotal(`${markerDetail.invoiceTotal}`)
+            .setMsg(Buffer.from(new RegisterPayable()
+                .setPayableUuid(contractDetail.payableUuid)
+                .setScopeId(contractDetail.scopeId)
+                .setPayableDenom(contractDetail.invoiceDenom)
+                .setPayableTotal(`${contractDetail.invoiceTotal}`)
                 .toJson()
             , 'utf-8').toString('base64'))
             .setFundsList([new Coin().setAmount(contractConfig.onboarding_cost).setDenom(contractConfig.onboarding_denom)])
