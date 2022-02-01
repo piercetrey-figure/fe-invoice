@@ -71,6 +71,7 @@ const Dropdown = ({
   value,
   onChange,
   disabled,
+  required,
 }) => {
   const renderOptions = () =>
     options.map((title, index) => (
@@ -87,7 +88,7 @@ const Dropdown = ({
         <SelectContainer className="inputContainer">
           {label && <Label htmlFor={name}>{label}</Label>}
           <StyledSelect
-            {...register(name)}
+            {...register(name, { required })}
             onChange={({ target }) => onChange(target.value)}
             disabled={disabled}
           >
@@ -108,6 +109,7 @@ Dropdown.propTypes = {
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   disabled: PropTypes.bool,
+  required: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 Dropdown.defaultProps = {
   className: "",
@@ -115,6 +117,7 @@ Dropdown.defaultProps = {
   value: null,
   disabled: false,
   onChange: () => {},
+  required: false,
 };
 
 export default Dropdown;

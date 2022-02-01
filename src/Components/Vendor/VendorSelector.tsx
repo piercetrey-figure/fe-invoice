@@ -4,9 +4,10 @@ import Dropdown from '../Dropdown/Dropdown';
 
 interface VendorSelectorProps {
     disabled?: boolean,
+    required?: boolean | string,
 }
 
-export const VendorSelector: FunctionComponent<VendorSelectorProps> = ({ disabled }) => {
+export const VendorSelector: FunctionComponent<VendorSelectorProps> = ({ disabled, required }) => {
     const { data: vendors, isLoading } = useVendors()
 
     if (isLoading) {
@@ -17,5 +18,5 @@ export const VendorSelector: FunctionComponent<VendorSelectorProps> = ({ disable
         return <div>Error fetching vendors</div>
     }
 
-    return <Dropdown disabled={disabled === true} name="vendor" label="Vendor" options={['Select a Vendor...', ...vendors]} />
+    return <Dropdown disabled={!!disabled} required={required} name="vendor" label="Vendor" options={['Select a Vendor...', ...vendors]} />
 }

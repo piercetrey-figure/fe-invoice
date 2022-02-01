@@ -37,9 +37,11 @@ export interface SignMessage {
     anyProto: any
 }
 
-export function parseSignMessage<T extends Message>(anyProto: any, deserializer: (b: Buffer) => T): SignMessage {
+export function parseSignMessage<T extends Message>(anyProto: any, deserializer: (b: Buffer) => T, modifier: (message: T) => T = (m) => m): SignMessage {
+    const deserialized = modifier(deserializer(decodeB64(anyProto.value)))
+    anyProto.value = Buffer.from(deserialized.serializeBinary()).toString('base64')
     return {
-        proto: deserializer(decodeB64(anyProto.value)).toObject(),
+        proto: deserialized.toObject(),
         anyProto
     }
 }
@@ -55,13 +57,11 @@ export const MultiMessageStepModal: FunctionComponent<MultiMessageStepModalProps
 
     const { walletConnectService: wcs } = useWalletConnect()
 
-    const handleSign = async (message: SignMessage) => {
-        return wcs.customAction({
-            message: Buffer.from(new Any().setTypeUrl(message.anyProto.typeUrl).setValue(message.anyProto.value).serializeBinary()).toString('base64'),
-            description: message.anyProto.typeUrl,
-            method: "provenance_sendTransaction",
-          })
-    }
+    const handleSign = async (message: SignMessage) => await wcs.customAction({
+        message: Buffer.from(new Any().setTypeUrl(message.anyProto.typeUrl).setValue(message.anyProto.value).serializeBinary()).toString('base64'),
+        description: message.anyProto.typeUrl,
+        method: "provenance_sendTransaction",
+    })
 
     useEffect(() => {
         (async () => {

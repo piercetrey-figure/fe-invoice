@@ -15,7 +15,7 @@ import { SubmittingOverlay } from "../../Submitting/SubmittingOverlay";
 import { CreateInvoiceResponse, useCreateInvoice } from "../../../hooks/useCreateInvoice";
 import { InvoiceLineItem } from "./InvoiceLineItem";
 import styled from "styled-components";
-import { useForm, FormProvider } from 'react-hook-form'
+import { useForm, FormProvider, useFormState } from 'react-hook-form'
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { MultiMessageStepModal, parseSignMessage, SignMessage } from "Components/MultiMessageStepModal";
 import { MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest } from '@provenanceio/wallet-lib/lib/proto/provenance/metadata/v1/tx_pb'
@@ -26,13 +26,14 @@ import { ROOT_PAYABLE_NAME } from "consts";
 interface TermsSelectorProps {
     value?: string,
     disabled?: boolean,
+    required?: boolean | string,
 }
 
-const TermsSelector: FunctionComponent<TermsSelectorProps> = ({ value, disabled }) => {
+const TermsSelector: FunctionComponent<TermsSelectorProps> = ({ value, disabled, required, }) => {
     const [selected, setSelected] = useState(value || '90 Days')
     const options = ['90 Days', '180 Days']
 
-    return <Dropdown disabled={disabled} name="terms" label="Terms" options={['Select Terms...', ...options]} />
+    return <Dropdown disabled={disabled} required={required} name="terms" label="Terms" options={['Select Terms...', ...options]} />
 }
 
 const LineItemWrapper = styled.div`
@@ -134,12 +135,12 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
         {submitting && <SubmittingOverlay>Submitting...</SubmittingOverlay>}
             <FormProvider {...formMethods}>
                 <form onSubmit={e => e.preventDefault()}>
-                    <VendorSelector disabled={reviewing} />
+                    <VendorSelector required disabled={reviewing} />
                     <FormRow columns={2}>
-                        <Input type="date" disabled={reviewing} label="Invoice Date" name="invoice_date"></Input>
-                        <TermsSelector disabled={reviewing} />
+                        <Input type="date" required disabled={reviewing} label="Invoice Date" name="invoice_date"></Input>
+                        <TermsSelector required disabled={reviewing} />
                     </FormRow>
-                    <Input disabled={reviewing} label="Description" name="description" />
+                    <Input disabled={reviewing} required label="Description" name="description" />
                     <LineItemWrapper>
                         <SubHeader>Line Items</SubHeader>
                         {lineItems.map((li, i) => <InvoiceLineItem disabled={reviewing} index={i} key={`invoice-lineitem-${i}`}></InvoiceLineItem>)}

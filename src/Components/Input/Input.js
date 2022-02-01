@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Colors } from "consts";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useFormState } from "react-hook-form";
+import { InputError } from "Components/Form";
 
 const InputContainer = styled.div`
   position: relative;
@@ -36,21 +37,28 @@ const Input = ({
   style,
   type,
   name,
+  required,
 }) => {
-  const { register } = useFormContext();
+  const { register, control } = useFormContext();
+  const {
+    errors: { [name]: error },
+  } = useFormState({ control });
 
   return (
-    <InputContainer width={width} className={`${className} inputContainer`}>
-      {label && <Label>{label}</Label>}
-      <StyledInput
-        placeholder={placeholder}
-        onChange={({ target }) => onChange(target.value)}
-        disabled={disabled}
-        style={style}
-        type={type}
-        {...register(name)}
-      />
-    </InputContainer>
+    <>
+      <InputContainer width={width} className={`${className} inputContainer`}>
+        {label && <Label>{label}</Label>}
+        <StyledInput
+          placeholder={placeholder}
+          onChange={({ target }) => onChange(target.value)}
+          disabled={disabled}
+          style={style}
+          type={type}
+          {...register(name, { required })}
+        />
+      </InputContainer>
+      {error && <InputError>{error}</InputError>}
+    </>
   );
 };
 
@@ -65,6 +73,7 @@ Input.propTypes = {
   style: PropTypes.any,
   type: PropTypes.string,
   name: PropTypes.string,
+  required: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 Input.defaultProps = {
   className: "",
@@ -75,6 +84,7 @@ Input.defaultProps = {
   placeholder: "Enter Value",
   style: {},
   type: "text",
+  required: false,
 };
 
 export default Input;
