@@ -28,6 +28,7 @@ interface InvoiceRowProps {
 }
 
 const TableElement = styled.div`
+    font-size: 1.2rem;
 `
 
 const InvoiceRowWrapper = styled.div`
@@ -46,9 +47,6 @@ const InvoiceRowWrapper = styled.div`
         display: flex;
         justify-content: flex-end;
     }
-    > *:not(:last-child) {
-        font-size: 1.25rem;
-    }
 `
 
 const InvoiceRow: FunctionComponent<InvoiceRowProps> = ({ invoice }) => {
@@ -59,7 +57,7 @@ const InvoiceRow: FunctionComponent<InvoiceRowProps> = ({ invoice }) => {
         <InvoiceRowWrapper>
             <TableElement>{invoice.getDescription()}</TableElement>
             <TableElement>{invoice.getToAddress()}</TableElement>
-            <TableElement>{formatter(invoiceTotal(invoice))}</TableElement>
+            <TableElement><b>{formatter(invoiceTotal(invoice))}</b></TableElement>
         </InvoiceRowWrapper>
     </Link>
 }
