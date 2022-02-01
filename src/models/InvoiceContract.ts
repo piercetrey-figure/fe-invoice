@@ -1,4 +1,3 @@
-import { string } from "prop-types"
 import { ContractMsg } from "./ContractBase"
 
 export class QueryInvoiceSettings {
@@ -20,43 +19,36 @@ export interface QueryInvoiceSettingsResponse {
     oracle_address: string,
 }
 
-export class RegisterPayableMarker extends ContractMsg {
-    register_payable_marker: {
-        marker_address: string,
-        marker_denom: string,
+export class RegisterPayable extends ContractMsg {
+    register_payable: {
+        payable_uuid: string,
         scope_id: string,
         payable_denom: string,
         payable_total: string,
     } = {
-        marker_address: '',
-        marker_denom: '',
+        payable_uuid: '',
         scope_id: '',
         payable_denom: '',
         payable_total: '',
     }
 
-    setMarkerAddress(marker_address: string): RegisterPayableMarker {
-        this.register_payable_marker.marker_address = marker_address
+    setPayableUuid(payable_uuid: string): RegisterPayable {
+        this.register_payable.payable_uuid = payable_uuid
         return this
     }
 
-    setMarkerDenom(marker_denom: string): RegisterPayableMarker {
-        this.register_payable_marker.marker_denom = marker_denom
+    setScopeId(scope_id: string): RegisterPayable {
+        this.register_payable.scope_id = scope_id
         return this
     }
 
-    setScopeId(scope_id: string): RegisterPayableMarker {
-        this.register_payable_marker.scope_id = scope_id
+    setPayableDenom(payable_denom: string): RegisterPayable {
+        this.register_payable.payable_denom = payable_denom
         return this
     }
 
-    setPayableDenom(payable_denom: string): RegisterPayableMarker {
-        this.register_payable_marker.payable_denom = payable_denom
-        return this
-    }
-
-    setPayableTotal(payable_total: string): RegisterPayableMarker {
-        this.register_payable_marker.payable_total = payable_total
+    setPayableTotal(payable_total: string): RegisterPayable {
+        this.register_payable.payable_total = payable_total
         return this
     }
 }

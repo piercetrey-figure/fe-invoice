@@ -7,6 +7,6 @@ export const WALLET_URL = PRODUCTION ? 'https://wallet.provenance.io' : 'https:/
 export const ROOT_NAME = 'wallettest3.pb'
 export const FEE_DENOM = 'nhash'
 
-// export const BASE_URL = 'http://localhost:13459/service-invoice/v1'
+// export const BASE_URL = 'http://localhost:13459/v1'
 export const BASE_URL = 'https://test.figure.tech/service-invoice/v1'
-export const ROOT_PAYABLE_NAME = 'payablestest8.pb'
+export const ROOT_PAYABLE_NAME = 'payablestest11.pb'
