@@ -19,6 +19,29 @@ export interface QueryInvoiceSettingsResponse {
     oracle_address: string,
 }
 
+export class QueryPayableState {
+    query_payable: {
+        marker_denom: string,
+    } = {
+        marker_denom: ''
+    }
+
+    setMarkerDenom(marker_denom: string): QueryPayableState {
+        this.query_payable.marker_denom = marker_denom
+        return this
+    }
+}
+
+export interface QueryPayableStateResponse {
+    marker_address: string,
+    marker_denom: string,
+    scope_id: string,
+    payable_denom: string,
+    payable_total_owed: string,
+    payable_remaining_owed: string,
+    oracle_approved: boolean,
+}
+
 export class RegisterPayable extends ContractMsg {
     register_payable: {
         payable_uuid: string,
@@ -49,6 +72,18 @@ export class RegisterPayable extends ContractMsg {
 
     setPayableTotal(payable_total: string): RegisterPayable {
         this.register_payable.payable_total = payable_total
+        return this
+    }
+}
+export class MakePayment extends ContractMsg {
+    make_payment: {
+        payable_uuid: string,
+    } = {
+        payable_uuid: '',
+    }
+
+    setPayableUuid(payable_uuid: string): MakePayment {
+        this.make_payment.payable_uuid = payable_uuid
         return this
     }
 }

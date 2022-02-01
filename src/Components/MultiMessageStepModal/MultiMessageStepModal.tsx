@@ -7,34 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Any } from '@provenanceio/wallet-lib/lib/proto/google/protobuf/any_pb';
 import { Message } from 'google-protobuf'
 import { decodeB64 } from "../../util";
-
-const Wrapper = styled.div`
-    position: fixed;
-
-    background: rgba(0, 0, 0, .7);
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    pre {
-        overflow-x: scroll;
-    }
-`
-
-const Body = styled.div`
-    background: ${Colors.LIGHT};
-    border-radius: 4px;
-    padding: 30px;
-    word-break: break-word;
-    min-width: 300px;
-    max-width: 90vw;
-`
+import { Modal } from "Components/Modal";
 
 export interface SignMessage {
     proto: any,
@@ -52,10 +25,10 @@ export function parseSignMessage<T extends Message>(anyProto: any, deserializer:
 
 export interface MultiMessageStepModalProps {
     messages: SignMessage[],
-    redirect: string,
+    onComplete?: () => any,
 }
 
-export const MultiMessageStepModal: FunctionComponent<MultiMessageStepModalProps> = ({ messages, redirect }) => {
+export const MultiMessageStepModal: FunctionComponent<MultiMessageStepModalProps> = ({ messages, onComplete }) => {
     const [current, setCurrent] = useState(0)
     const navigate = useNavigate()
 
@@ -73,15 +46,17 @@ export const MultiMessageStepModal: FunctionComponent<MultiMessageStepModalProps
                 await handleSign(message)
                 setCurrent(c => Math.min(c + 1, messages.length - 1))
             }
-            navigate(redirect)
+            onComplete && onComplete()
         })()
     }, [messages])
 
-    return <Wrapper>
-        <Body>
-            <Header>Sign Message ({current + 1} / {messages.length})</Header>
-            <pre>{JSON.stringify(messages[current].proto, null, 2)}</pre>
-            <SubHeader>Please Check Your Device for Signature Prompt</SubHeader>
-        </Body>
-    </Wrapper>
+    if (messages.length == 0) {
+        return <></>
+    }
+
+    return <Modal>
+        <Header>Sign Message ({current + 1} / {messages.length})</Header>
+        <pre>{JSON.stringify(messages[current].proto, null, 2)}</pre>
+        <SubHeader>Please Check Your Device for Signature Prompt</SubHeader>
+    </Modal>
 }

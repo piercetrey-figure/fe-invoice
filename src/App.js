@@ -35,6 +35,11 @@ const Content = styled.div`
   border-radius: 4px;
   margin-bottom: 40px;
 `;
+const WalletConnectVersion = styled.div`
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+`;
 
 export const App = () => {
   const [popupContent, setPopupContent] = useState("");
@@ -122,6 +127,10 @@ export const App = () => {
                 ) : (
                   <Connect walletConnectService={wcs} setPopup={setPopup} />
                 )}
+                <WalletConnectVersion>
+                  WalletConnect-JS Version:{" "}
+                  {REACT_APP_WCJS_VERSION || "??.??.??"}
+                </WalletConnectVersion>
               </>
             }
           >
@@ -139,9 +148,6 @@ export const App = () => {
             walletConnectState={walletConnectState}
             title="Scan to initiate walletConnect-js session"
           />
-          <div>
-            WalletConnect-JS Version: {REACT_APP_WCJS_VERSION || "??.??.??"}
-          </div>
         </Router>
       </HomeContainer>
     </Wrapper>

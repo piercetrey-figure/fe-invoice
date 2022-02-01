@@ -1,12 +1,19 @@
+import { useEffect, useMemo, useState } from 'react'
 import { FormWrapper } from "Components/Form";
 import { SubHeader } from "Components/Headers";
-import { Colors, DISPLAY_DATE_FORMAT, INVOICE_DATE_FORMAT } from "consts";
+import { Colors, DISPLAY_DATE_FORMAT, INVOICE_DATE_FORMAT, ROOT_PAYABLE_NAME } from "consts";
 import { parse, format } from "date-fns";
 import { useGetInvoice } from "hooks";
 import { FunctionComponent } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { formatter, lineItemPrice, lineItemTotal, invoiceTotal } from "../../../util";
+import { lineItemPrice, lineItemTotal, invoiceTotal, currencyFormatter } from "../../../util";
+import { Button } from 'Components';
+import { PaymentModal } from 'Components/PaymentModal';
+import { MultiMessageStepModal, parseSignMessage, SignMessage } from 'Components/MultiMessageStepModal';
+import { InvoiceContractService } from 'Services';
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb';
 
 const InvoiceHeader = styled.div`
     display: flex;
@@ -31,6 +38,8 @@ const SimpleTwoColumn = styled.div`
     }
 `
 
+const InvoiceLineItems = styled.div``
+
 const InvoiceLineItem = styled.div`
     display: grid;
     grid-template-columns: 4fr 2fr 1fr 1fr;
@@ -44,6 +53,10 @@ const InvoiceLineItem = styled.div`
 
     > :nth-child(3), > :nth-child(4) {
         text-align: right;
+    }
+
+    &:nth-child(odd):not(:first-child) {
+        background-color: rgba(0, 0, 0, .1);
     }
 `
 
@@ -70,6 +83,30 @@ export interface InvoiceDetailsProps {
 export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
     const { uuid } = useParams()
     const { data: invoice, isError, isLoading } = useGetInvoice(uuid || '')
+    const [paymentOpen, setPaymentOpen] = useState(false)
+    const [messages, setMessages] = useState<SignMessage[]>([])
+    const [outstandingBalance, setOutstandingBalance] = useState(0)
+
+    const { walletConnectState: { address } } = useWalletConnect()
+
+    const paymentDenom = invoice?.getPaymentDenom() || 'USD'
+    const formatter = useMemo(() => currencyFormatter(paymentDenom), [paymentDenom])
+
+    const service = new InvoiceContractService(ROOT_PAYABLE_NAME)
+
+    const refreshOutstandingBalance = async () => {
+        if (uuid) {
+            // todo: update w/ non-marker uuid
+            const payableState = await service.getPayableState(`invoice-${uuid}`)
+            setOutstandingBalance(+payableState.payable_total_owed)
+        } else {
+            setOutstandingBalance(0)
+        }
+    }
+
+    useEffect(() => {
+        refreshOutstandingBalance()
+    }, [uuid])
 
     if (!invoice || isError) {
         return <div>Error retrieving invoice</div>
@@ -81,56 +118,76 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
 
     const dateFormat = (date?: string) => format(parse(date || '', INVOICE_DATE_FORMAT, new Date()), DISPLAY_DATE_FORMAT)
 
-    return <FormWrapper title="Invoice Details">
-        <InvoiceHeader>
-            <div>
+    const handlePayment = async (amount: number) => {
+        setPaymentOpen(false)
+
+        const message = await service.generateMakePaymentBase64Message(invoice?.getInvoiceUuid()?.getValue() || '', amount, paymentDenom, address)
+
+        setMessages([
+            parseSignMessage({ typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: message }, MsgExecuteContract.deserializeBinary)
+        ])
+    }
+
+    const handleCompletedPayment = () => {
+        setMessages([])
+    }
+
+    return <>
+        {messages?.length > 0 && <MultiMessageStepModal messages={messages} onComplete={handleCompletedPayment} />}
+        {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={outstandingBalance} paymentDenom={invoice.getPaymentDenom()} initialAmount={0} onSubmit={handlePayment} />}
+        <FormWrapper title="Invoice Details" action={<Button onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
+            <InvoiceHeader>
                 <div>
-                    <b>Description:</b> {invoice.getDescription()}
+                    <div>
+                        <b>Description:</b> {invoice.getDescription()}
+                    </div>
+                    <div>
+                        <b>From:</b> {invoice.getFromAddress()}
+                    </div>
+                    <div>
+                        <b>To:</b> {invoice.getToAddress()}
+                    </div>
                 </div>
                 <div>
-                    <b>From:</b> {invoice.getFromAddress()}
+                    <SimpleTwoColumn>
+                        <b>UUID:</b>
+                        <div>{invoice.getInvoiceUuid()?.getValue()}</div>
+                        <b>Created Date:</b>
+                        <div>{dateFormat(invoice.getInvoiceCreatedDate()?.getValue())}</div>
+                        <b>Due Date:</b>
+                        <div>{dateFormat(invoice.getInvoiceDueDate()?.getValue())}</div>
+                    </SimpleTwoColumn>
                 </div>
+            </InvoiceHeader>
+            <InvoiceLineItems>
+                <InvoiceLineItemHeader>
+                    <div>Items</div>
+                    <div>Quantity</div>
+                    <div>Price</div>
+                    <div>Amount</div>
+                </InvoiceLineItemHeader>
+                {invoice.getLineItemsList().map((lineItem, i) => <InvoiceLineItem key={`lineItem-${i}`}>
+                    <div>
+                        <b>{lineItem.getName()}</b>
+                        <p>{lineItem.getDescription()}</p>
+                    </div>
+                    <div>{lineItem.getQuantity()}</div>
+                    <div>{formatter(lineItemPrice(lineItem))}</div>
+                    <div><b>{formatter(lineItemTotal(lineItem))}</b></div>
+                </InvoiceLineItem>)}
+            </InvoiceLineItems>
+            <InvoiceFooter>
+                <div></div>
                 <div>
-                    <b>To:</b> {invoice.getToAddress()}
+                    <b>Total:</b>
+                    <div>todo: payment listing</div>
                 </div>
-            </div>
-            <div>
-                <SimpleTwoColumn>
-                    <b>UUID:</b>
-                    <div>{invoice.getInvoiceUuid()?.getValue()}</div>
-                    <b>Created Date:</b>
-                    <div>{dateFormat(invoice.getInvoiceCreatedDate()?.getValue())}</div>
-                    <b>Due Date:</b>
-                    <div>{dateFormat(invoice.getInvoiceDueDate()?.getValue())}</div>
-                </SimpleTwoColumn>
-            </div>
-        </InvoiceHeader>
-        <InvoiceLineItemHeader>
-            <div>Items</div>
-            <div>Quantity</div>
-            <div>Price</div>
-            <div>Amount</div>
-        </InvoiceLineItemHeader>
-        {invoice.getLineItemsList().map((lineItem, i) => <InvoiceLineItem key={`lineItem-${i}`}>
-            <div>
-                <b>{lineItem.getName()}</b>
-                <p>{lineItem.getDescription()}</p>
-            </div>
-            <div>{lineItem.getQuantity()}</div>
-            <div>{formatter.format(lineItemPrice(lineItem))}</div>
-            <div>{formatter.format(lineItemTotal(lineItem))}</div>
-        </InvoiceLineItem>)}
-        <InvoiceFooter>
-            <div></div>
-            <div>
-                <b>Total:</b>
-                <div>todo: payment listing</div>
-            </div>
-            <div>{formatter.format(invoiceTotal(invoice))}</div>
-            <div style={{borderBottom: '2px solid grey', gridColumn: '2/4' }}></div>
-            <div></div>
-            <b>Amount Due (USD):</b>
-            <div>{formatter.format(invoiceTotal(invoice))}</div>
-        </InvoiceFooter>
-    </FormWrapper>
+                <div><b>{formatter(invoiceTotal(invoice))}</b></div>
+                <div style={{borderBottom: '2px solid grey', gridColumn: '2/4' }}></div>
+                <div></div>
+                <b>Amount Due ({paymentDenom}):</b>
+                <div><b>{formatter(outstandingBalance)}</b></div>
+            </InvoiceFooter>
+        </FormWrapper>
+    </>
 }

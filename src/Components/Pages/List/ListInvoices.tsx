@@ -1,18 +1,14 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useMemo } from "react";
 import { useInvoiceList } from "../../../hooks/useInvoiceList";
 import { FormWrapper } from "../../Form";
 import { Button } from 'Components';
 import { Invoice } from "../../../proto/invoice_protos_pb";
 import styled from "styled-components";
 import { TitleHeader } from "../../Headers";
-import { calculateTotal, formatter, invoiceTotal } from "../../../util";
+import { calculateTotal, currencyFormatter, invoiceTotal } from "../../../util";
 import { Search } from "../../Search";
 import { Colors } from 'consts';
-import { useNavigate } from 'react-router-dom'
-
-interface TotalDetailsProps {
-
-}
+import { Link, useNavigate } from 'react-router-dom'
 
 const TotalDetails = styled.div`
     display: flex;
@@ -36,10 +32,16 @@ const TableElement = styled.div`
 
 const InvoiceRowWrapper = styled.div`
     display: grid;
-    grid-template-columns: 2fr 2fr 1fr;
+    grid-template-columns: 2fr 2fr 2fr;
     border-top: 1px solid black;
-    padding: 10px 0;
+    padding: 10px;
     align-items: center;
+
+    color: ${Colors.TEXT};
+    &:hover {
+        background: rgba(0, 0, 0, .2);
+    }
+
     > *:last-child {
         display: flex;
         justify-content: flex-end;
@@ -50,25 +52,30 @@ const InvoiceRowWrapper = styled.div`
 `
 
 const InvoiceRow: FunctionComponent<InvoiceRowProps> = ({ invoice }) => {
-    const navigate = useNavigate()
+    const paymentDenom = invoice.getPaymentDenom()
+    const formatter = useMemo(() => currencyFormatter(paymentDenom), [paymentDenom])
 
-    return <InvoiceRowWrapper>
-        <TableElement>{invoice.getToAddress()}</TableElement>
-        <TableElement>{invoiceTotal(invoice)}</TableElement>
-        {/* <TableElement><Button color={Colors.ACTION} backgroundColor="transparent" borderColor={Colors.ACTION}>Details</Button></TableElement> */}
-        <TableElement><Button secondary onClick={() => navigate(`/${invoice.getInvoiceUuid()?.getValue()}`)}>Details</Button></TableElement>
-    </InvoiceRowWrapper>
+    return <Link to={`/${invoice.getInvoiceUuid()?.getValue()}`}>
+        <InvoiceRowWrapper>
+            <TableElement>{invoice.getDescription()}</TableElement>
+            <TableElement>{invoice.getToAddress()}</TableElement>
+            <TableElement>{formatter(invoiceTotal(invoice))}</TableElement>
+        </InvoiceRowWrapper>
+    </Link>
 }
 
 const InvoiceHeaderWrapper = styled(InvoiceRowWrapper)`
     border-top: none;
     font-weight: bold;
+    &:hover {
+        background: transparent;
+    }
 `
 
 const InvoiceHeader = () => <InvoiceHeaderWrapper>
+    <TableElement>Description</TableElement>
     <TableElement>Vendor</TableElement>
     <TableElement>Amount</TableElement>
-    <TableElement />
 </InvoiceHeaderWrapper>
 
 export interface ListInvoicesProps {
@@ -89,7 +96,7 @@ export const ListInvoices: FunctionComponent<ListInvoicesProps> = ({}) => {
     }
 
     const details = <TotalDetails>
-        <TitleHeader title="Total Amount Outstanding">{invoices && formatter.format(calculateTotal(invoices))}</TitleHeader>
+        <TitleHeader title="Total Amount Outstanding">{invoices && calculateTotal(invoices)} (VARIOUS CURRENCIES?)</TitleHeader>
         <TitleHeader title="Total Invoices Outstanding">{invoices?.length || 0}</TitleHeader>
         <Search maxWidth={300} />
     </TotalDetails>

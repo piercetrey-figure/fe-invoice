@@ -7,7 +7,7 @@ import { DARK_BACKGROUND, LIGHT, LIGHT_TEXT, TEXT_ACCENT } from "../../../consts
 const Wrapper = styled.div`
     display: flex;
     flex-grow: 1;
-    min-height: 100vh;
+    height: 100vh;
 `
 
 const Sidebar = styled.div`
@@ -20,6 +20,7 @@ const Sidebar = styled.div`
 const Content = styled.div`
     flex-grow: 1;
     padding: 20px;
+    overflow-y: scroll;
 `
 
 export interface SidebarLayoutProps {

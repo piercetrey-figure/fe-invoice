@@ -48,11 +48,13 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
     const { onCreate } = useCreateInvoice()
     const { data: denoms } = useGetDenoms()
 
+    const navigate = useNavigate()
+
     const [reviewing, setReviewing] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const [signing, setSigning] = useState(false)
     const [messages, setMessages] = useState<SignMessage[]>([])
-    const [redirect, setRedirect] = useState('')
+    const [handleComplete, setHandleComplete] = useState(() => () => navigate('/'))
     const [error, setError] = useState('')
 
     const { walletConnectState: { address } } = useWalletConnect()
@@ -89,8 +91,9 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
         }])
         setLineItems([...lineItems, dummyItem])
     }
-
-    const navigate = useNavigate()
+    useEffect(() => {
+        addLineItem()
+    }, [])
 
     const createInvoice = async (data: any) => {
         setSubmitting(true)
@@ -122,7 +125,7 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
                 parseSignMessage(createResult.scopeGenerationDetail.writeRecordRequest, MsgWriteRecordRequest.deserializeBinary),
                 parseSignMessage({typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: await invoiceContractService.generateCreateInvoiceBase64Message(createResult.payablesContractExecutionDetail, address)}, MsgExecuteContract.deserializeBinary),
             ])
-            setRedirect(`/invoices/${invoice?.getInvoiceUuid()?.getValue()}`)
+            setHandleComplete(() => navigate(`/invoices/${invoice?.getInvoiceUuid()?.getValue()}`))
 
             setSigning(true)
         } catch (e) {
@@ -134,7 +137,7 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
     }
 
     return <FormWrapper title="Create Invoice">
-        {signing && <MultiMessageStepModal messages={messages} redirect={redirect} />}
+        {signing && <MultiMessageStepModal messages={messages} onComplete={handleComplete} />}
         {submitting && <SubmittingOverlay>Submitting...</SubmittingOverlay>}
             <FormProvider {...formMethods}>
                 <form onSubmit={e => e.preventDefault()}>
