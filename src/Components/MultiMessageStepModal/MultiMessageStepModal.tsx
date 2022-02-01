@@ -21,6 +21,10 @@ const Wrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+
+    pre {
+        overflow-x: scroll;
+    }
 `
 
 const Body = styled.div`

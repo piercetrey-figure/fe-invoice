@@ -21,11 +21,11 @@ export interface InvoiceLineItemProps {
 
 export const InvoiceLineItem: FunctionComponent<InvoiceLineItemProps> = ({ index, disabled }) => {
     return <Wrapper>
-        <Input disabled={disabled} label="Name" name={`line_item.${index}.name`} />
-        <Input disabled={disabled} label="Description" name={`line_item.${index}.description`} />
+        <Input disabled={disabled} required="please enter a name" label="Name" name={`line_item.${index}.name`} />
+        <Input disabled={disabled} required="please enter a description" label="Description" name={`line_item.${index}.description`} />
         <FormRow columns={2}>
-            <Input disabled={disabled} type="number" label="Quantity" name={`line_item.${index}.quantity`} />
-            <Input disabled={disabled} type="number" label="Price" name={`line_item.${index}.price`} />
+            <Input disabled={disabled} required="please enter a quantity" type="number" label="Quantity" name={`line_item.${index}.quantity`} />
+            <Input disabled={disabled} required="please enter a price" type="number" label="Price" name={`line_item.${index}.price`} />
         </FormRow>
     </Wrapper>
 }

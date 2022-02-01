@@ -1,6 +1,6 @@
 import { FormWrapper } from "Components/Form";
 import { SubHeader } from "Components/Headers";
-import { Colors } from "consts";
+import { Colors, DISPLAY_DATE_FORMAT, INVOICE_DATE_FORMAT } from "consts";
 import { parse, format } from "date-fns";
 import { useGetInvoice } from "hooks";
 import { FunctionComponent } from "react";
@@ -79,7 +79,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
         return <div>Loading...</div>
     }
 
-    const dateFormat = (date?: string) => format(parse(date || '', 'yyyy-MM-dd', new Date()), 'MMMM d, yyyy')
+    const dateFormat = (date?: string) => format(parse(date || '', INVOICE_DATE_FORMAT, new Date()), DISPLAY_DATE_FORMAT)
 
     return <FormWrapper title="Invoice Details">
         <InvoiceHeader>

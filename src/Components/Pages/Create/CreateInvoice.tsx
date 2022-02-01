@@ -21,7 +21,8 @@ import { MultiMessageStepModal, parseSignMessage, SignMessage } from "Components
 import { MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest } from '@provenanceio/wallet-lib/lib/proto/provenance/metadata/v1/tx_pb'
 import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb';
 import { InvoiceContractService } from "Services";
-import { ROOT_PAYABLE_NAME } from "consts";
+import { INVOICE_DATE_FORMAT, ROOT_PAYABLE_NAME } from "consts";
+import { useGetDenoms } from "hooks";
 
 interface TermsSelectorProps {
     value?: string,
@@ -45,6 +46,7 @@ interface CreateInvoiceProps {
 
 export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
     const { onCreate } = useCreateInvoice()
+    const { data: denoms } = useGetDenoms()
 
     const [reviewing, setReviewing] = useState(false)
     const [submitting, setSubmitting] = useState(false)
@@ -57,8 +59,9 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
 
     const defaultLineItems: { name: string, description: string, quantity: number, price: number }[] = []
     const formMethods = useForm({
+        reValidateMode: 'onBlur',
         defaultValues: {
-            invoice_date: format(new Date(), 'yyyy-MM-dd'),
+            invoice_date: format(new Date(), INVOICE_DATE_FORMAT),
             // todo: remove below, for testing only
             description: 'the best description',
             line_item: defaultLineItems
@@ -94,14 +97,14 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
         
         try {
             const invoice = newInvoice()
-            const startDate = parse(data.invoice_date, 'yyyy-MM-dd', new Date())
+            const startDate = parse(data.invoice_date, INVOICE_DATE_FORMAT, new Date())
             const dueDate = addDays(startDate, parseInt(data.terms))
             invoice.setToAddress(data.vendor)
                 .setFromAddress(address)
                 .setInvoiceCreatedDate(newDate(startDate))
                 .setInvoiceDueDate(newDate(dueDate))
                 .setDescription(data.description)
-                .setPaymentDenom('nhash')
+                .setPaymentDenom(data.paymentDenom)
                 .setLineItemsList(data.line_item.map((lineItem: any) => newLineItem()
                     .setName(lineItem.name)
                     .setDescription(lineItem.description)
@@ -140,7 +143,8 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
                         <Input type="date" required disabled={reviewing} label="Invoice Date" name="invoice_date"></Input>
                         <TermsSelector required disabled={reviewing} />
                     </FormRow>
-                    <Input disabled={reviewing} required label="Description" name="description" />
+                    <Input disabled={reviewing} required="please enter a description" label="Description" name="description" />
+                    <Dropdown name="paymentDenom" label="Payment Denom" options={['Select a Payment Denom', ...(denoms || [])]} />
                     <LineItemWrapper>
                         <SubHeader>Line Items</SubHeader>
                         {lineItems.map((li, i) => <InvoiceLineItem disabled={reviewing} index={i} key={`invoice-lineitem-${i}`}></InvoiceLineItem>)}
