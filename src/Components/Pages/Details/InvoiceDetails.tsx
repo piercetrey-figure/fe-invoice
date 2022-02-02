@@ -101,7 +101,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
             try {
                 setOutstandingBalanceFetched(false)
                 const payableState = await service.getPayableState(uuid)
-                setOutstandingBalance(+payableState.payable_total_owed)
+                setOutstandingBalance(+payableState.payable_remaining_owed)
                 setOutstandingBalanceFetched(true)
             } catch (e) {
                 alert(`error fetching payable state ${e}`)
