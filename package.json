@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "private": false,
   "devDependencies": {
-    "@provenanceio/walletconnect-js": "^0.1.49",
+    "@provenanceio/walletconnect-js": "^0.1.51",
     "@types/styled-components": "^5.1.20",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/parser": "^4.33.0",
