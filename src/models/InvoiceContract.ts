@@ -21,24 +21,29 @@ export interface QueryInvoiceSettingsResponse {
 
 export class QueryPayableState {
     query_payable: {
-        marker_denom: string,
+        payable_uuid: string,
     } = {
-        marker_denom: ''
+        payable_uuid: ''
     }
 
-    setMarkerDenom(marker_denom: string): QueryPayableState {
-        this.query_payable.marker_denom = marker_denom
+    setPayableUuid(payable_uuid: string): QueryPayableState {
+        this.query_payable.payable_uuid = payable_uuid
         return this
     }
 }
 
 export interface QueryPayableStateResponse {
-    marker_address: string,
-    marker_denom: string,
+    payable_uuid: string,
+    // The address of the scope created during onboarding of a payable
     scope_id: string,
+    // The denomination the payable accepts for payment
     payable_denom: string,
+    // The amount of payable_denom that the payable was originally created to reflect
     payable_total_owed: string,
+    // The amount of payable_denom left unpaid on the payable
     payable_remaining_owed: string,
+    // Whether or not the oracle has reviewed the structure of the payable and determine if it is
+    // a valid payable
     oracle_approved: boolean,
 }
 

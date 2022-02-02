@@ -28,7 +28,7 @@ export class InvoiceContractService {
     }
 
     async getPayableState(payableUuid: string): Promise<QueryPayableStateResponse> {
-        return this.wasmService.queryWasmCustom<QueryPayableState, QueryPayableStateResponse>(await this.getContractAddress(), new QueryPayableState().setMarkerDenom(payableUuid))
+        return this.wasmService.queryWasmCustom<QueryPayableState, QueryPayableStateResponse>(await this.getContractAddress(), new QueryPayableState().setPayableUuid(payableUuid))
     }
 
     async generateCreateInvoiceBase64Message(contractDetail: PayablesContractExecutionDetail, address: string): Promise<string> {

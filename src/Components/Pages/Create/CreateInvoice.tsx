@@ -66,7 +66,8 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
             invoice_date: format(new Date(), INVOICE_DATE_FORMAT),
             // todo: remove below, for testing only
             description: 'the best description',
-            line_item: defaultLineItems
+            line_item: defaultLineItems,
+            paymentDenom: 'nhash'
         }
     })
 
@@ -97,6 +98,7 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
 
     const createInvoice = async (data: any) => {
         setSubmitting(true)
+        setError('')
         
         try {
             const invoice = newInvoice()
@@ -113,7 +115,7 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
                     .setDescription(lineItem.description)
                     .setQuantity(lineItem.quantity)
                     .setPrice(newDecimal(lineItem.price))
-                )) // todo: populate
+                ))
                 
             const createResult = await onCreate(invoice)
 
@@ -125,7 +127,7 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
                 parseSignMessage(createResult.scopeGenerationDetail.writeRecordRequest, MsgWriteRecordRequest.deserializeBinary),
                 parseSignMessage({typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: await invoiceContractService.generateCreateInvoiceBase64Message(createResult.payablesContractExecutionDetail, address)}, MsgExecuteContract.deserializeBinary),
             ])
-            setHandleComplete(() => navigate(`/invoices/${invoice?.getInvoiceUuid()?.getValue()}`))
+            setHandleComplete(() => () => navigate(`/invoices/${invoice?.getInvoiceUuid()?.getValue()}`))
 
             setSigning(true)
         } catch (e) {

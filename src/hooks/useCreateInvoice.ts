@@ -28,11 +28,18 @@ export const useCreateInvoice = () => {
         onCreate: async (invoice: Invoice): Promise<CreateInvoiceResponse> => {
             const { lineItemsList: lineItems, ...rest } = invoice.toObject()
             const body = JSON.stringify({ ...rest, lineItems })
-            return (await fetch(`${BASE_URL}/invoices/onboard`, { method: 'POST', body, headers: {
+            const res = await fetch(`${BASE_URL}/invoices/onboard`, { method: 'POST', body, headers: {
                 'Content-Type': 'application/json',
                 'x-public-key': urlSafeBase64ToBase64(publicKey),
                 'x-address': address,
-            } })).json()
+            } })
+            const resBody = await res.json()
+
+            if (res.status != 200) {
+                throw Error(`Error Creating Invoice: ${resBody.error}`)
+            }
+
+            return resBody
         }
     }
 }
