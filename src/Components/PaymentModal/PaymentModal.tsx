@@ -23,7 +23,7 @@ export const PaymentModal: FunctionComponent<PaymentModalProps> = ({ invoiceUuid
         <FormProvider {...formMethods}>
             <form onSubmit={formMethods.handleSubmit((data: any) => onSubmit(data.amount))}>
                 <Header style={{ marginTop: 0 }}>Make a Payment</Header>
-                <Input required="Please specify a payment amount" type="number" name="amount" label={`Amount (${paymentDenom})`} />
+                <Input required="Please specify a payment amount" type="number" name="amount" label={`Amount (${paymentDenom})`} registerConfig={{ max: outstandingBalance }} />
                 <div>Outstanding Balance: {formatter(outstandingBalance)}</div>
                 <Button width="100%" type="submit">Submit</Button>
             </form>

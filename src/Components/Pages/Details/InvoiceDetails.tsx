@@ -139,12 +139,13 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
 
     const handleCompletedPayment = () => {
         setMessages([])
+        refreshOutstandingBalance()
     }
 
     return <>
         {messages?.length > 0 && <MultiMessageStepModal messages={messages} onComplete={handleCompletedPayment} />}
         {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={outstandingBalance} paymentDenom={invoice.getPaymentDenom()} initialAmount={0} onSubmit={handlePayment} />}
-        <FormWrapper title="Invoice Details" action={<Button disabled={!outstandingBalanceFetched} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
+        <FormWrapper title="Invoice Details" action={<Button disabled={!outstandingBalanceFetched || outstandingBalance <= 0} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
             <InvoiceHeader>
                 <div>
                     <div>

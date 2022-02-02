@@ -38,6 +38,7 @@ const Input = ({
   type,
   name,
   required,
+  registerConfig,
 }) => {
   const { register, control } = useFormContext();
   const {
@@ -54,7 +55,7 @@ const Input = ({
           disabled={disabled}
           style={style}
           type={type}
-          {...register(name, { required })}
+          {...register(name, { required, ...registerConfig })}
         />
       </InputContainer>
       {error && <InputError>{error}</InputError>}
@@ -74,6 +75,7 @@ Input.propTypes = {
   type: PropTypes.string,
   name: PropTypes.string,
   required: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  registerConfig: PropTypes.any,
 };
 Input.defaultProps = {
   className: "",
@@ -85,6 +87,7 @@ Input.defaultProps = {
   style: {},
   type: "text",
   required: false,
+  registerConfig: {},
 };
 
 export default Input;
