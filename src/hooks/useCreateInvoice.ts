@@ -4,6 +4,7 @@ import { useWalletConnect } from '@provenanceio/walletconnect-js'
 import { urlSafeBase64ToBase64 } from "../util"
 
 export interface PayablesContractExecutionDetail {
+    payableType: string,
     payableUuid: string,
     scopeId: string,
     invoiceDenom: string,

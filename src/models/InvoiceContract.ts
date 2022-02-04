@@ -49,15 +49,22 @@ export interface QueryPayableStateResponse {
 
 export class RegisterPayable extends ContractMsg {
     register_payable: {
+        payable_type: string,
         payable_uuid: string,
         scope_id: string,
         payable_denom: string,
         payable_total: string,
     } = {
+        payable_type: '',
         payable_uuid: '',
         scope_id: '',
         payable_denom: '',
         payable_total: '',
+    }
+
+    setPayableType(payable_type: string): RegisterPayable {
+        this.register_payable.payable_type = payable_type
+        return this
     }
 
     setPayableUuid(payable_uuid: string): RegisterPayable {
