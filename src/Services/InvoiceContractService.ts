@@ -38,6 +38,7 @@ export class InvoiceContractService {
         ])
         const message = new MsgExecuteContract()
             .setMsg(Buffer.from(new RegisterPayable()
+                .setPayableType(contractDetail.payableType)
                 .setPayableUuid(contractDetail.payableUuid)
                 .setScopeId(contractDetail.scopeId)
                 .setPayableDenom(contractDetail.invoiceDenom)
