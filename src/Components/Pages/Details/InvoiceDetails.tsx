@@ -3,7 +3,7 @@ import { FormWrapper } from "Components/Form";
 import { SubHeader } from "Components/Headers";
 import { Colors, DISPLAY_DATE_FORMAT, INVOICE_DATE_FORMAT, ROOT_PAYABLE_NAME } from "consts";
 import { parse, format } from "date-fns";
-import { useGetInvoice } from "hooks";
+import {useGetCalc, useGetInvoice} from "hooks";
 import { FunctionComponent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
@@ -14,6 +14,8 @@ import { MultiMessageStepModal, parseSignMessage, SignMessage } from 'Components
 import { InvoiceContractService } from 'Services';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb';
+import {LineItemCalc, PaymentCalc} from "../../../models/InvoiceCalc";
+import AddressLink from "../../AddressLink";
 
 const InvoiceHeader = styled.div`
     display: flex;
@@ -82,7 +84,7 @@ export interface InvoiceDetailsProps {
 
 export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
     const { uuid } = useParams()
-    const { data: invoice, isError, isLoading } = useGetInvoice(uuid || '')
+    const { data: invoiceCalc, isError, isLoading } = useGetCalc(uuid || '')
     const [paymentOpen, setPaymentOpen] = useState(false)
     const [messages, setMessages] = useState<SignMessage[]>([])
     const [outstandingBalanceFetched, setOutstandingBalanceFetched] = useState(false)
@@ -91,7 +93,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
 
     const { walletConnectState: { address } } = useWalletConnect()
 
-    const paymentDenom = invoice?.getPaymentDenom() || 'USD'
+    const paymentDenom = invoiceCalc?.paymentDenom || 'USD'
     const formatter = useMemo(() => currencyFormatter(paymentDenom), [paymentDenom])
 
     const service = new InvoiceContractService(ROOT_PAYABLE_NAME)
@@ -117,7 +119,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
         refreshOutstandingBalance()
     }, [uuid])
 
-    if (!invoice || isError) {
+    if (!invoiceCalc || isError) {
         return <div>Error retrieving invoice</div>
     }
 
@@ -127,10 +129,12 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
 
     const dateFormat = (date?: string) => format(parse(date || '', INVOICE_DATE_FORMAT, new Date()), DISPLAY_DATE_FORMAT)
 
+    const timestampToDate = (timestamp: string) => format(Date.parse(timestamp), DISPLAY_DATE_FORMAT)
+
     const handlePayment = async (amount: number) => {
         setPaymentOpen(false)
 
-        const message = await service.generateMakePaymentBase64Message(invoice?.getInvoiceUuid()?.getValue() || '', amount, paymentDenom, address)
+        const message = await service.generateMakePaymentBase64Message(invoiceCalc?.uuid || '', amount, paymentDenom, address)
 
         setMessages([
             parseSignMessage({ typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: message }, MsgExecuteContract.deserializeBinary)
@@ -144,28 +148,28 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
 
     return <>
         {messages?.length > 0 && <MultiMessageStepModal messages={messages} onComplete={handleCompletedPayment} />}
-        {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={outstandingBalance} paymentDenom={invoice.getPaymentDenom()} initialAmount={0} onSubmit={handlePayment} />}
+        {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={outstandingBalance} paymentDenom={invoiceCalc.paymentDenom} initialAmount={0} onSubmit={handlePayment} />}
         <FormWrapper title="Invoice Details" action={<Button disabled={!outstandingBalanceFetched || outstandingBalance <= 0} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
             <InvoiceHeader>
                 <div>
                     <div>
-                        <b>Description:</b> {invoice.getDescription()}
+                        <b>Description:</b> {invoiceCalc.description}
                     </div>
                     <div>
-                        <b>From:</b> {invoice.getFromAddress()}
+                        <b>From:</b> {invoiceCalc.ownerAddress}
                     </div>
                     <div>
-                        <b>To:</b> {invoice.getToAddress()}
+                        <b>To:</b> {invoiceCalc.payerAddress}
                     </div>
                 </div>
                 <div>
                     <SimpleTwoColumn>
                         <b>UUID:</b>
-                        <div>{invoice.getInvoiceUuid()?.getValue()}</div>
+                        <div>{invoiceCalc.uuid}</div>
                         <b>Created Date:</b>
-                        <div>{dateFormat(invoice.getInvoiceCreatedDate()?.getValue())}</div>
+                        <div>{dateFormat(invoiceCalc.createdDate)}</div>
                         <b>Due Date:</b>
-                        <div>{dateFormat(invoice.getInvoiceDueDate()?.getValue())}</div>
+                        <div>{dateFormat(invoiceCalc.dueDate)}</div>
                     </SimpleTwoColumn>
                 </div>
             </InvoiceHeader>
@@ -176,27 +180,42 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
                     <div>Price</div>
                     <div>Amount</div>
                 </InvoiceLineItemHeader>
-                {invoice.getLineItemsList().map((lineItem, i) => <InvoiceLineItem key={`lineItem-${i}`}>
+                {invoiceCalc?.lineItems?.map((lineItem: LineItemCalc, i: number) => <InvoiceLineItem key={`lineItem-${i}`}>
                     <div>
-                        <b>{lineItem.getName()}</b>
-                        <p>{lineItem.getDescription()}</p>
+                        <b>{lineItem.name}</b>
+                        <p>{lineItem.description}</p>
                     </div>
-                    <div>{lineItem.getQuantity()}</div>
-                    <div>{formatter(lineItemPrice(lineItem))}</div>
-                    <div><b>{formatter(lineItemTotal(lineItem))}</b></div>
+                    <div>{lineItem.quantity}</div>
+                    <div>{formatter(lineItem.price)}</div>
+                    <div><b>{formatter(lineItem.total)}</b></div>
                 </InvoiceLineItem>)}
             </InvoiceLineItems>
+            {invoiceCalc?.payments?.length > 0 && (
+                <InvoiceLineItems>
+                    <InvoiceLineItemHeader>
+                        <div>Payments</div>
+                        <div>Date</div>
+                        <div>Sender</div>
+                        <div>Amount</div>
+                    </InvoiceLineItemHeader>
+                    {invoiceCalc?.payments?.map((payment: PaymentCalc, i: number) => <InvoiceLineItem key={`payment=${i}`}>
+                        <div>
+                            <b>Payment UUID</b>
+                            <p>{payment.uuid}</p>
+                        </div>
+                        <div>{timestampToDate(payment.effectiveTime)}</div>
+                        <AddressLink address={payment.fromAddress} showAddressText={false} altText={'View'} />
+                        <div><b>{payment.paymentAmount}{payment.paymentDenom}</b></div>
+                    </InvoiceLineItem>)}
+                </InvoiceLineItems>
+            )}
             <InvoiceFooter>
-                <div></div>
-                <div>
-                    <b>Total:</b>
-                    <div>todo: payment listing</div>
-                </div>
-                <div><b>{formatter(invoiceTotal(invoice))}</b></div>
-                <div style={{borderBottom: '2px solid grey', gridColumn: '2/4' }}></div>
-                <div></div>
+                <b>{formatter(invoiceCalc?.originalOwed || 0)}</b>
+                <b>- {formatter(invoiceCalc?.paymentSum || 0)}</b>
+                <div style={{borderBottom: '2px solid grey', gridColumn: '2/4' }} />
+                <div />
                 <b>Amount Due ({paymentDenom}):</b>
-                <div><b>{outstandingBalanceFetched ? formatter(outstandingBalance) : 'Loading...'}</b></div>
+                <div><b>{formatter(invoiceCalc?.remainingOwed || 0)}</b></div>
             </InvoiceFooter>
         </FormWrapper>
     </>
