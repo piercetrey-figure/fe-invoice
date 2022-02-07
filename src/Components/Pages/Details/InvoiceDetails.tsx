@@ -132,7 +132,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
     return <>
         {messages?.length > 0 && <MultiMessageStepModal messages={messages} onComplete={handleCompletedPayment} />}
         {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={invoiceCalc?.remainingOwed} paymentDenom={invoiceCalc.paymentDenom} initialAmount={0} onSubmit={handlePayment} />}
-        <FormWrapper title="Invoice Details" action={<Button disabled={!invoiceCalc || invoiceCalc.remainingOwed <= 0} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
+        <FormWrapper title="Invoice Details" action={<Button disabled={!invoiceCalc || invoiceCalc.paidOff || invoiceCalc.paymentStatus == 'RESTRICTED'} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
             <InvoiceHeader>
                 <div>
                     <div>

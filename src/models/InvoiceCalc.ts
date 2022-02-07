@@ -46,5 +46,5 @@ export interface InvoiceCalc {
     remainingOwed: number,
     paymentDelinquentDays: number,
     payoffTime?: number,
-    isPaidOff: boolean,
+    paidOff: boolean,
 }
