@@ -14,6 +14,7 @@ import { MultiMessageStepModal, parseSignMessage, SignMessage } from 'Components
 import { InvoiceContractService } from 'Services';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb';
+import { ShareButton } from 'Components/ShareButton';
 
 const InvoiceHeader = styled.div`
     display: flex;
@@ -74,6 +75,13 @@ const InvoiceFooter = styled.div`
     grid-template-columns: 4fr 3fr 1fr;
     font-size: 1.3rem;
     text-align: right;
+`
+
+const ActionContainer = styled.div`
+    display: flex;
+    > :not(:last-child) {
+        margin-right: 5px;
+    }
 `
 
 export interface InvoiceDetailsProps {
@@ -142,10 +150,15 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
         refreshOutstandingBalance()
     }
 
+    const action = <ActionContainer>
+        <ShareButton />
+        <Button disabled={!outstandingBalanceFetched || outstandingBalance <= 0} onClick={() => setPaymentOpen(true)}>Make Payment</Button>
+    </ActionContainer>
+
     return <>
         {messages?.length > 0 && <MultiMessageStepModal messages={messages} onComplete={handleCompletedPayment} />}
         {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={outstandingBalance} paymentDenom={invoice.getPaymentDenom()} initialAmount={0} onSubmit={handlePayment} />}
-        <FormWrapper title="Invoice Details" action={<Button disabled={!outstandingBalanceFetched || outstandingBalance <= 0} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
+        <FormWrapper title="Invoice Details" action={action}>
             <InvoiceHeader>
                 <div>
                     <div>
