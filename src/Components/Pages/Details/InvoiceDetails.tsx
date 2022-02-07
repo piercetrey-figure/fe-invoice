@@ -15,6 +15,7 @@ import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb';
 import {LineItemCalc, PaymentCalc} from "../../../models/InvoiceCalc";
 import AddressLink from "../../AddressLink";
+import { ShareButton } from 'Components/ShareButton';
 
 const InvoiceHeader = styled.div`
     display: flex;
@@ -85,6 +86,13 @@ const InvoiceFooter = styled.div`
     text-align: right;
 `
 
+const ActionContainer = styled.div`
+    display: flex;
+    > :not(:last-child) {
+        margin-right: 5px;
+    }
+`
+
 export interface InvoiceDetailsProps {
 
 }
@@ -129,10 +137,15 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
         refreshInvoice()
     }
 
+    const action = <ActionContainer>
+        <ShareButton />
+        <Button disabled={!invoiceCalc || invoiceCalc.paidOff || invoiceCalc.paymentStatus == 'RESTRICTED'} onClick={() => setPaymentOpen(true)}>Make Payment</Button>
+    </ActionContainer>
+
     return <>
         {messages?.length > 0 && <MultiMessageStepModal messages={messages} onComplete={handleCompletedPayment} />}
         {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={invoiceCalc?.remainingOwed} paymentDenom={invoiceCalc.paymentDenom} initialAmount={0} onSubmit={handlePayment} />}
-        <FormWrapper title="Invoice Details" action={<Button disabled={!invoiceCalc || invoiceCalc.paidOff || invoiceCalc.paymentStatus == 'RESTRICTED'} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
+        <FormWrapper title="Invoice Details" action={action}>
             <InvoiceHeader>
                 <div>
                     <div>

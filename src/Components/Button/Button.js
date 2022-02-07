@@ -38,7 +38,10 @@ const StyledButton = styled.button`
     filter: grayscale(80%);
   }
 `;
-const ButtonContent = styled.div``;
+const ButtonContent = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const Button = ({
   className,
@@ -116,6 +119,7 @@ Button.defaultProps = {
   loading: false,
   color: "white",
   secondary: false,
+  borderColor: "transparent",
 };
 
 export default Button;
