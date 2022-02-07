@@ -1,8 +1,7 @@
 import { useQuery } from "react-query"
 import { toInvoice } from "../util";
 import { BASE_URL } from '../consts/network';
-import { Invoice } from '../proto/invoice_protos_pb.d';
-import {InvoiceCalc} from "../models/InvoiceCalc";
+import { InvoiceCalc } from "../models/InvoiceCalc";
 
 export const useGetInvoice = (uuid: string) => {
     return useQuery(['invoices', uuid], async () => {
