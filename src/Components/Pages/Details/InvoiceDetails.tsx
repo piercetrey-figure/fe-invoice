@@ -41,7 +41,7 @@ const SimpleTwoColumn = styled.div`
 
 const InvoiceLineItems = styled.div``
 
-const InvoiceLineItem = styled.div`
+const InvoiceItemDetail = styled.div`
     display: grid;
     grid-template-columns: 4fr 2fr 1fr 1fr;
     grid-gap: 10px;
@@ -61,8 +61,16 @@ const InvoiceLineItem = styled.div`
     }
 `
 
-const InvoiceLineItemHeader = styled(InvoiceLineItem)`
+const InvoiceLineItemHeader = styled(InvoiceItemDetail)`
     background: ${Colors.DARK_BACKGROUND};
+    color: ${Colors.LIGHT};
+    font-weight: bold;
+`
+
+const InvoicePayments = styled.div``
+
+const InvoicePaymentHeader = styled(InvoiceItemDetail)`
+    background: ${Colors.PAYMENT_BLUE};
     color: ${Colors.LIGHT};
     font-weight: bold;
 `
@@ -124,7 +132,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
     return <>
         {messages?.length > 0 && <MultiMessageStepModal messages={messages} onComplete={handleCompletedPayment} />}
         {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={invoiceCalc?.remainingOwed} paymentDenom={invoiceCalc.paymentDenom} initialAmount={0} onSubmit={handlePayment} />}
-        <FormWrapper title="Invoice Details" action={<Button disabled={!invoiceCalc || invoiceCalc.remainingOwed == 0} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
+        <FormWrapper title="Invoice Details" action={<Button disabled={!invoiceCalc || invoiceCalc.remainingOwed <= 0} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
             <InvoiceHeader>
                 <div>
                     <div>
@@ -159,7 +167,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
                     <div>Price</div>
                     <div>Amount</div>
                 </InvoiceLineItemHeader>
-                {invoiceCalc?.lineItems?.map((lineItem: LineItemCalc, i: number) => <InvoiceLineItem key={`lineItem-${i}`}>
+                {invoiceCalc?.lineItems?.map((lineItem: LineItemCalc, i: number) => <InvoiceItemDetail key={`lineItem-${i}`}>
                     <div>
                         <b>{lineItem.name}</b>
                         <p>{lineItem.description}</p>
@@ -167,17 +175,17 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
                     <div>{lineItem.quantity}</div>
                     <div>{formatter(lineItem.price)}</div>
                     <div><b>{formatter(lineItem.total)}</b></div>
-                </InvoiceLineItem>)}
+                </InvoiceItemDetail>)}
             </InvoiceLineItems>
             {invoiceCalc?.payments?.length > 0 && (
-                <InvoiceLineItems>
-                    <InvoiceLineItemHeader>
+                <InvoicePayments>
+                    <InvoicePaymentHeader>
                         <div>Payments</div>
                         <div>Date</div>
                         <div>Sender</div>
                         <div>Amount</div>
-                    </InvoiceLineItemHeader>
-                    {invoiceCalc?.payments?.map((payment: PaymentCalc, i: number) => <InvoiceLineItem key={`payment=${i}`}>
+                    </InvoicePaymentHeader>
+                    {invoiceCalc?.payments?.map((payment: PaymentCalc, i: number) => <InvoiceItemDetail key={`payment=${i}`}>
                         <div>
                             <b>Payment UUID</b>
                             <p>{payment.uuid}</p>
@@ -185,8 +193,8 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
                         <div>{timestampToDate(payment.effectiveTime)}</div>
                         <AddressLink address={payment.fromAddress} showAddressText={false} altText={'View'} />
                         <div><b>{payment.paymentAmount}{payment.paymentDenom}</b></div>
-                    </InvoiceLineItem>)}
-                </InvoiceLineItems>
+                    </InvoiceItemDetail>)}
+                </InvoicePayments>
             )}
             <InvoiceFooter>
                 <div />

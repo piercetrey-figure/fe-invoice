@@ -8,3 +8,4 @@ export const DARKEN = '#EDEBE9'
 export const DARK = '#655C53'
 export const WARN = '#E53B10'
 export const ACTION = '#42368E';
+export const PAYMENT_BLUE = '#566BF5';
