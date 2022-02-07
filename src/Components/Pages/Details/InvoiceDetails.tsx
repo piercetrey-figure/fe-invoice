@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { FormWrapper } from "Components/Form";
-import { SubHeader } from "Components/Headers";
 import { Colors, DISPLAY_DATE_FORMAT, INVOICE_DATE_FORMAT, ROOT_PAYABLE_NAME } from "consts";
 import { parse, format } from "date-fns";
-import {useGetCalc, useGetInvoice} from "hooks";
+import { useGetCalc } from "hooks";
 import { FunctionComponent } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { enumStringToHumanReadable, lineItemPrice, lineItemTotal, invoiceTotal, currencyFormatter } from "../../../util";
+import { enumStringToHumanReadable, currencyFormatter } from "../../../util";
 import { Button } from 'Components';
 import { PaymentModal } from 'Components/PaymentModal';
 import { MultiMessageStepModal, parseSignMessage, SignMessage } from 'Components/MultiMessageStepModal';
@@ -84,12 +83,9 @@ export interface InvoiceDetailsProps {
 
 export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
     const { uuid } = useParams()
-    const { data: invoiceCalc, isError, isLoading } = useGetCalc(uuid || '')
+    const { data: invoiceCalc, isError, isLoading, refetch: refreshInvoice, } = useGetCalc(uuid || '')
     const [paymentOpen, setPaymentOpen] = useState(false)
     const [messages, setMessages] = useState<SignMessage[]>([])
-    const [outstandingBalanceFetched, setOutstandingBalanceFetched] = useState(false)
-    const [outstandingBalance, setOutstandingBalance] = useState(0)
-    const navigate = useNavigate()
 
     const { walletConnectState: { address } } = useWalletConnect()
 
@@ -97,27 +93,6 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
     const formatter = useMemo(() => currencyFormatter(paymentDenom), [paymentDenom])
 
     const service = new InvoiceContractService(ROOT_PAYABLE_NAME)
-
-    const refreshOutstandingBalance = async () => {
-        if (uuid) {
-            try {
-                setOutstandingBalanceFetched(false)
-                const payableState = await service.getPayableState(uuid)
-                setOutstandingBalance(+payableState.payable_remaining_owed)
-                setOutstandingBalanceFetched(true)
-            } catch (e) {
-                alert(`error fetching payable state ${e}`)
-                navigate('/')
-            }
-        } else {
-            setOutstandingBalanceFetched(false)
-            setOutstandingBalance(0)
-        }
-    }
-
-    useEffect(() => {
-        refreshOutstandingBalance()
-    }, [uuid])
 
     if (!invoiceCalc || isError) {
         return <div>Error retrieving invoice</div>
@@ -143,13 +118,13 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
 
     const handleCompletedPayment = () => {
         setMessages([])
-        refreshOutstandingBalance()
+        refreshInvoice()
     }
 
     return <>
         {messages?.length > 0 && <MultiMessageStepModal messages={messages} onComplete={handleCompletedPayment} />}
-        {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={outstandingBalance} paymentDenom={invoiceCalc.paymentDenom} initialAmount={0} onSubmit={handlePayment} />}
-        <FormWrapper title="Invoice Details" action={<Button disabled={!outstandingBalanceFetched || outstandingBalance <= 0} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
+        {paymentOpen && <PaymentModal requestClose={() => setPaymentOpen(false)} invoiceUuid={uuid || ''} outstandingBalance={invoiceCalc?.remainingOwed} paymentDenom={invoiceCalc.paymentDenom} initialAmount={0} onSubmit={handlePayment} />}
+        <FormWrapper title="Invoice Details" action={<Button disabled={!invoiceCalc || invoiceCalc.isPaidOff} onClick={() => setPaymentOpen(true)}>Make Payment</Button>}>
             <InvoiceHeader>
                 <div>
                     <div>
@@ -214,11 +189,15 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
                 </InvoiceLineItems>
             )}
             <InvoiceFooter>
+                <div />
+                <b>Total:</b>
                 <b>{formatter(invoiceCalc?.originalOwed || 0)}</b>
-                <b>- {formatter(invoiceCalc?.paymentSum || 0)}</b>
+                <div />
+                <b>Payments:</b>
+                <b>{invoiceCalc?.paymentSum > 0 ? "- " : ""}{formatter(invoiceCalc?.paymentSum || 0)}</b>
                 <div style={{borderBottom: '2px solid grey', gridColumn: '2/4' }} />
                 <div />
-                <b>Amount Due ({paymentDenom}):</b>
+                <b>Amount Due:</b>
                 <div><b>{formatter(invoiceCalc?.remainingOwed || 0)}</b></div>
             </InvoiceFooter>
         </FormWrapper>
