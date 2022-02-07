@@ -7,7 +7,7 @@ import {useGetCalc, useGetInvoice} from "hooks";
 import { FunctionComponent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { lineItemPrice, lineItemTotal, invoiceTotal, currencyFormatter } from "../../../util";
+import { enumStringToHumanReadable, lineItemPrice, lineItemTotal, invoiceTotal, currencyFormatter } from "../../../util";
 import { Button } from 'Components';
 import { PaymentModal } from 'Components/PaymentModal';
 import { MultiMessageStepModal, parseSignMessage, SignMessage } from 'Components/MultiMessageStepModal';
@@ -170,6 +170,10 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
                         <div>{dateFormat(invoiceCalc.createdDate)}</div>
                         <b>Due Date:</b>
                         <div>{dateFormat(invoiceCalc.dueDate)}</div>
+                        <b>Onboarding Status:</b>
+                        <div>{enumStringToHumanReadable(invoiceCalc.invoiceStatus)}</div>
+                        <b>Payment Status:</b>
+                        <div>{enumStringToHumanReadable(invoiceCalc.paymentStatus)}</div>
                     </SimpleTwoColumn>
                 </div>
             </InvoiceHeader>

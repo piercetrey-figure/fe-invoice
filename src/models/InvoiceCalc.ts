@@ -1,3 +1,7 @@
+/**
+ * A calc detail for an individual line item.  Holds information about its total, alongside all originally-onboarded
+ * data.
+ */
 export interface LineItemCalc {
     uuid: string,
     name: string,
@@ -7,6 +11,9 @@ export interface LineItemCalc {
     total: number,
 }
 
+/**
+ * A calc detail for an individual payment. Holds information about how much funds were left after applying it.
+ */
 export interface PaymentCalc {
     uuid: string,
     invoiceUuid: string,
@@ -18,6 +25,9 @@ export interface PaymentCalc {
     owedAfterPayment: number,
 }
 
+/**
+ * The root calc interface.  Holds all details for the status of an invoice after it has been successfully onboarded.
+ */
 export interface InvoiceCalc {
     uuid: string,
     calcTime: string,
