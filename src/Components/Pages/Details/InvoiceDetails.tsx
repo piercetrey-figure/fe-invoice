@@ -199,10 +199,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
                         <div>Amount</div>
                     </InvoicePaymentHeader>
                     {invoiceCalc?.payments?.map((payment: PaymentCalc, i: number) => <InvoiceItemDetail key={`payment=${i}`}>
-                        <div>
-                            <b>Payment UUID</b>
-                            <p>{payment.uuid}</p>
-                        </div>
+                        <div>UUID: {payment.uuid}</div>
                         <div>{timestampToDate(payment.effectiveTime)}</div>
                         <AddressLink address={payment.fromAddress} showAddressText={false} altText={'View'} />
                         <div><b>{payment.paymentAmount}{payment.paymentDenom}</b></div>
