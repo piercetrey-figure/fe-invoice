@@ -20,6 +20,7 @@ import { SidebarLayout, SidebarLink } from "./Components/Layout/Sidebar";
 import { ListInvoices } from "./Components/Pages/List/ListInvoices";
 import { CreateInvoice } from "./Components/Pages/Create/CreateInvoice";
 import { InvoiceDetails } from "Components/Pages/Details";
+import { InvoiceBills } from "Components/Pages/Bills";
 
 const Wrapper = styled.div`
   background: ${PRIMARY_BACKGROUND};
@@ -117,7 +118,8 @@ export const App = () => {
                 <Header>InVoice</Header>
                 {connected ? (
                   <>
-                    <SidebarLink to="/">My Invoices</SidebarLink>
+                    <SidebarLink to="/">Sent Invoices</SidebarLink>
+                    <SidebarLink to="/bills">Received Invoices</SidebarLink>
                     <SidebarLink to="/create">Create Invoice</SidebarLink>
                     <Disconnect
                       walletConnectService={wcs}
@@ -137,6 +139,7 @@ export const App = () => {
             {connected && (
               <Routes>
                 <Route path="/" element={<ListInvoices />} />
+                <Route path="/bills" element={<InvoiceBills />} />
                 <Route path="/create" element={<CreateInvoice />} />
                 <Route path="/:uuid" element={<InvoiceDetails />} />
                 <Route path="*" element={<ListInvoices />} />

@@ -18,3 +18,4 @@ export const lineItemPrice = (lineItem: LineItem) => +(lineItem?.getPrice()?.get
 export const lineItemTotal = (lineItem: LineItem) => lineItemPrice(lineItem) * lineItem.getQuantity()
 export const invoiceTotal = (invoice: Invoice) => invoice?.getLineItemsList().reduce((acc, item) => acc + lineItemTotal(item), 0)
 export const calculateTotal = (invoices: Invoice[]) => invoices.reduce((acc, invoice) => acc + invoiceTotal(invoice), 0)
+export const distinctInvoiceDenoms = (invoices: Invoice[]) => invoices.map(invoice => invoice.getPaymentDenom()).filter((value, index, self) => self.indexOf(value) === index)

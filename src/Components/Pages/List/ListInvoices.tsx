@@ -5,7 +5,7 @@ import { Button } from 'Components';
 import { Invoice } from "../../../proto/invoice_protos_pb";
 import styled from "styled-components";
 import { TitleHeader } from "../../Headers";
-import { calculateTotal, currencyFormatter, invoiceTotal } from "../../../util";
+import {calculateTotal, currencyFormatter, distinctInvoiceDenoms, invoiceTotal} from "../../../util";
 import { Search } from "../../Search";
 import { Colors } from 'consts';
 import { Link, useNavigate } from 'react-router-dom'
@@ -94,7 +94,7 @@ export const ListInvoices: FunctionComponent<ListInvoicesProps> = ({}) => {
     }
 
     const details = <TotalDetails>
-        <TitleHeader title="Total Amount Outstanding">{invoices && calculateTotal(invoices)} (VARIOUS CURRENCIES?)</TitleHeader>
+        <TitleHeader title="Total Amount Outstanding">{invoices && calculateTotal(invoices)} {invoices && distinctInvoiceDenoms(invoices).join()}</TitleHeader>
         <TitleHeader title="Total Invoices Outstanding">{invoices?.length || 0}</TitleHeader>
         <Search maxWidth={300} />
     </TotalDetails>
