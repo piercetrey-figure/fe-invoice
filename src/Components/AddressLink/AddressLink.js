@@ -1,36 +1,32 @@
-import styled from "styled-components";
 import PropTypes from "prop-types";
 import {EXPLORER_URL} from "consts";
 
-const Text = styled.p`
-  font-size: 1.6rem;
-  line-height: 3rem;
-  margin: 0;
-`;
-
 const AddressLink = ({
-    className,
     address,
-}) => {
-    return <Text className={className}>
-        Address:{" "}
+    altText,
+    showAddressText,
+}) => <div>
         <a
             href={`${EXPLORER_URL}/accounts/${address}`}
             target="_blank"
             rel="noreferrer"
         >
-            {address}
+            {showAddressText ? "Address: " : ""}
+            {altText ? altText : address}
         </a>
-    </Text>;
-};
+    </div>;
 
 AddressLink.propTypes = {
     className: PropTypes.string,
     address: PropTypes.string.isRequired,
+    altText: PropTypes.string,
+    showAddressText: PropTypes.bool,
 };
 
 AddressLink.defaultProps = {
     className: "",
+    altText: null,
+    showAddressText: true,
 };
 
 export default AddressLink;
