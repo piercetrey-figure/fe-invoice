@@ -92,10 +92,10 @@ export const InvoiceBills: FunctionComponent<InvoiceBillsProps> = ({ }) => {
 
     const totals = <TotalDetails>
         <TitleHeader title="Total Amount Billed">{invoices && calculateTotal(invoices)} {invoices && distinctInvoiceDenoms(invoices).join()}</TitleHeader>
-        <TitleHeader title="Total Invoices Billed to You">{invoices?.length || 0}</TitleHeader>
+        <TitleHeader title="Total Invoices Received">{invoices?.length || 0}</TitleHeader>
     </TotalDetails>
 
-    return <FormWrapper title="Bills" headerDetails={totals}>
+    return <FormWrapper title="Received Invoices" headerDetails={totals}>
         {invoices && <BillTable>
             <BillHeader />
             {invoices.map((invoice, i) => <BillRow key={invoice?.getInvoiceUuid()?.getValue() + `-${i}`} invoice={invoice} />)}

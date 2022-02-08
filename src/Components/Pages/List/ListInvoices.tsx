@@ -94,12 +94,12 @@ export const ListInvoices: FunctionComponent<ListInvoicesProps> = ({}) => {
     }
 
     const details = <TotalDetails>
-        <TitleHeader title="Total Amount Outstanding">{invoices && calculateTotal(invoices)} {invoices && distinctInvoiceDenoms(invoices).join()}</TitleHeader>
-        <TitleHeader title="Total Invoices Outstanding">{invoices?.length || 0}</TitleHeader>
+        <TitleHeader title="Total Amount Requested">{invoices && calculateTotal(invoices)} {invoices && distinctInvoiceDenoms(invoices).join()}</TitleHeader>
+        <TitleHeader title="Total Invoices Sent">{invoices?.length || 0}</TitleHeader>
         <Search maxWidth={300} />
     </TotalDetails>
 
-    return <FormWrapper title="Invoices" action={<Button onClick={() => navigate('/create')}>New Invoice</Button>} headerDetails={details}>
+    return <FormWrapper title="Sent Invoices" action={<Button onClick={() => navigate('/create')}>New Invoice</Button>} headerDetails={details}>
         {invoices && <InvoiceTable>
             <InvoiceHeader />
             {invoices.map((invoice, i) => <InvoiceRow key={invoice?.getInvoiceUuid()?.getValue() + `-${i}`} invoice={invoice}/>)}
