@@ -1,4 +1,4 @@
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import { useInvoiceList } from "../../../hooks/useInvoiceList";
 import { FormWrapper } from "../../Form";
 import { Button } from 'Components';
@@ -9,12 +9,14 @@ import { calculateTotal, currencyFormatter, invoiceTotal } from "../../../util";
 import { Search } from "../../Search";
 import { Colors } from 'consts';
 import { Link, useNavigate } from 'react-router-dom'
+import { ListFilters, ToggleFilter } from "Components/Filters";
 
 const TotalDetails = styled.div`
     display: flex;
     flex-grow: 1;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
 `
 
 const InvoiceTable = styled.div`
@@ -82,7 +84,8 @@ export interface ListInvoicesProps {
 
 
 export const ListInvoices: FunctionComponent<ListInvoicesProps> = ({}) => {
-    const { data: invoices, isLoading, isError, error } = useInvoiceList()
+    const [from, setFrom] = useState(true)
+    const { data: invoices, isLoading, isError, error } = useInvoiceList(from)
     const navigate = useNavigate()
 
     if (isLoading) {
@@ -93,11 +96,16 @@ export const ListInvoices: FunctionComponent<ListInvoicesProps> = ({}) => {
         return <div>Error fetching invoices</div>
     }
 
-    const details = <TotalDetails>
-        <TitleHeader title="Total Amount Outstanding">{invoices && calculateTotal(invoices)} (VARIOUS CURRENCIES?)</TitleHeader>
-        <TitleHeader title="Total Invoices Outstanding">{invoices?.length || 0}</TitleHeader>
-        <Search maxWidth={300} />
-    </TotalDetails>
+    const details = <>
+        <TotalDetails>
+            {/* <TitleHeader title="Total Amount Outstanding">{invoices && calculateTotal(invoices)} (VARIOUS CURRENCIES?)</TitleHeader> */}
+            <TitleHeader title="Total Invoices Outstanding">{invoices?.length || 0}</TitleHeader>
+            <Search maxWidth={300} />
+        </TotalDetails>
+        <ListFilters>
+            <ToggleFilter options={[{ key: 'from', value: 'Sent' }, { key: 'to', value: 'Received' }]} onChange={key => setFrom(key === 'from')} />
+        </ListFilters>
+    </>
 
     return <FormWrapper title="Invoices" action={<Button onClick={() => navigate('/create')}>New Invoice</Button>} headerDetails={details}>
         {invoices && <InvoiceTable>

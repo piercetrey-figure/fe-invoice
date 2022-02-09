@@ -45,9 +45,7 @@ export const FormWrapper: FunctionComponent<FormWrapperProps> = ({ title, action
             <Title>{title}</Title>
             {action && <Action>{action}</Action>}
         </HeaderRow>
-        {headerDetails && <HeaderRow>
-            {headerDetails}
-        </HeaderRow>}
+        {headerDetails}
     </Header>
     {children}
 </Wrapper>

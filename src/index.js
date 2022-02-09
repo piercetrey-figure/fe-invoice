@@ -12,10 +12,7 @@ const queryClient = new QueryClient();
 
 ReactDOM.render(
   <StrictMode>
-    <WalletConnectContextProvider
-      network={NETWORK}
-      bridge="https://bridge.walletconnect.org/"
-    >
+    <WalletConnectContextProvider network={NETWORK}>
       <WalletContextProvider
         grpcServiceAddress={GRPC_URL}
         walletUrl={WALLET_URL}

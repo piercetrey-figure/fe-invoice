@@ -28,6 +28,8 @@ const Body = styled.div`
     word-break: break-word;
     min-width: 300px;
     max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: scroll;
     position: relative;
 `
 
