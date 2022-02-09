@@ -5,11 +5,12 @@ import { Button } from 'Components';
 import { Invoice } from "../../../proto/invoice_protos_pb";
 import styled from "styled-components";
 import { TitleHeader } from "../../Headers";
-import { calculateTotal, currencyFormatter, invoiceTotal } from "../../../util";
+import { calculateTotal, currencyFormatter, enumStringToHumanReadable, invoiceTotal } from "../../../util";
 import { Search } from "../../Search";
 import { Colors } from 'consts';
 import { Link, useNavigate } from 'react-router-dom'
 import { ListFilters, ToggleFilter } from "Components/Filters";
+import { InvoiceWithCalc } from "models";
 
 const TotalDetails = styled.div`
     display: flex;
@@ -26,7 +27,7 @@ const InvoiceTable = styled.div`
 `
 
 interface InvoiceRowProps {
-    invoice: Invoice
+    invoice: InvoiceWithCalc
 }
 
 const TableElement = styled.div`
@@ -35,7 +36,7 @@ const TableElement = styled.div`
 
 const InvoiceRowWrapper = styled.div`
     display: grid;
-    grid-template-columns: 2fr 2fr 2fr;
+    grid-template-columns: repeat(5, 1fr);
     border-top: 1px solid black;
     padding: 10px;
     align-items: center;
@@ -52,14 +53,16 @@ const InvoiceRowWrapper = styled.div`
 `
 
 const InvoiceRow: FunctionComponent<InvoiceRowProps> = ({ invoice }) => {
-    const paymentDenom = invoice.getPaymentDenom()
+    const paymentDenom = invoice.invoice.paymentDenom
     const formatter = useMemo(() => currencyFormatter(paymentDenom), [paymentDenom])
 
-    return <Link to={`/${invoice.getInvoiceUuid()?.getValue()}`}>
+    return <Link to={`/${invoice.uuid}`}>
         <InvoiceRowWrapper>
-            <TableElement>{invoice.getDescription()}</TableElement>
-            <TableElement>{invoice.getToAddress()}</TableElement>
-            <TableElement><b>{formatter(invoiceTotal(invoice))}</b></TableElement>
+            <TableElement>{invoice.invoice.description}</TableElement>
+            <TableElement>{invoice.invoice.toAddress}</TableElement>
+            <TableElement><b>{formatter(invoice.totalOwed)}</b></TableElement>
+            <TableElement><b>{formatter(invoice.calc.remainingOwed)}</b></TableElement>
+            <TableElement>{enumStringToHumanReadable(invoice.calc.paymentStatus)}</TableElement>
         </InvoiceRowWrapper>
     </Link>
 }
@@ -76,6 +79,8 @@ const InvoiceHeader = () => <InvoiceHeaderWrapper>
     <TableElement>Description</TableElement>
     <TableElement>Vendor</TableElement>
     <TableElement>Amount</TableElement>
+    <TableElement>Balance</TableElement>
+    <TableElement>Payment Status</TableElement>
 </InvoiceHeaderWrapper>
 
 export interface ListInvoicesProps {
@@ -110,7 +115,7 @@ export const ListInvoices: FunctionComponent<ListInvoicesProps> = ({}) => {
     return <FormWrapper title="Invoices" action={<Button onClick={() => navigate('/create')}>New Invoice</Button>} headerDetails={details}>
         {invoices && <InvoiceTable>
             <InvoiceHeader />
-            {invoices.map((invoice, i) => <InvoiceRow key={invoice?.getInvoiceUuid()?.getValue() + `-${i}`} invoice={invoice}/>)}
+            {invoices.map((invoice, i) => <InvoiceRow key={invoice?.uuid + `-${i}`} invoice={invoice}/>)}
         </InvoiceTable>}
     </FormWrapper>
 }
