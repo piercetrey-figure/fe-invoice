@@ -93,14 +93,6 @@ export const ListInvoices: FunctionComponent<ListInvoicesProps> = ({}) => {
     const { data: invoices, isLoading, isError, error } = useInvoiceList(from)
     const navigate = useNavigate()
 
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
-
-    if (isError) {
-        return <div>Error fetching invoices</div>
-    }
-
     const details = <>
         <TotalDetails>
             {/* <TitleHeader title="Total Amount Outstanding">{invoices && calculateTotal(invoices)} (VARIOUS CURRENCIES?)</TitleHeader> */}
@@ -113,7 +105,9 @@ export const ListInvoices: FunctionComponent<ListInvoicesProps> = ({}) => {
     </>
 
     return <FormWrapper title="Invoices" action={<Button onClick={() => navigate('/create')}>New Invoice</Button>} headerDetails={details}>
-        {invoices && <InvoiceTable>
+        {isLoading && <div>Loading...</div>}
+        {isError && <div>Error fetching invoices</div>}
+        {invoices && !isLoading && <InvoiceTable>
             <InvoiceHeader />
             {invoices.map((invoice, i) => <InvoiceRow key={invoice?.uuid + `-${i}`} invoice={invoice}/>)}
         </InvoiceTable>}
