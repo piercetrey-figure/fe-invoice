@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { FormWrapper } from "Components/Form";
-import { Colors, DISPLAY_DATE_FORMAT, INVOICE_DATE_FORMAT, ROOT_PAYABLE_NAME } from "consts";
+import { Colors, DISPLAY_DATE_FORMAT, INVOICE_DATE_FORMAT, MD, ROOT_PAYABLE_NAME } from "consts";
 import { parse, format } from "date-fns";
 import { useGetCalc } from "hooks";
 import { FunctionComponent } from "react";
@@ -28,6 +28,11 @@ const InvoiceHeader = styled.div`
         flex-basis: min-content;
         white-space: nowrap;
     }
+
+
+    @media (max-width: ${MD}px) {
+        flex-direction: column;
+    }
 `
 
 const SimpleTwoColumn = styled.div`
@@ -37,6 +42,14 @@ const SimpleTwoColumn = styled.div`
 
     > :nth-child(odd) {
         text-align: right;
+    }
+
+
+    @media (max-width: ${MD}px) {
+        grid-template-columns: 1fr;
+        > :nth-child(odd) {
+            text-align: left;
+        }
     }
 `
 
@@ -60,6 +73,28 @@ const InvoiceItemDetail = styled.div`
     &:nth-child(odd):not(:first-child) {
         background-color: rgba(0, 0, 0, .1);
     }
+
+
+    @media (max-width: ${MD}px) {
+        grid-template-columns: repeat(4, 1fr);
+
+        > :nth-child(1) {
+            grid-column: 1/4;
+        }
+        > :nth-child(2) {
+            grid-column: 1;
+        }
+        > :nth-child(3) {
+            grid-column: 2;
+        }
+        > :nth-child(4) {
+            grid-column: 4;
+        }
+        > :nth-child(2), > :nth-child(3) {
+            grid-row: 2;
+            text-align: left;
+        }
+    }
 `
 
 const InvoiceLineItemHeader = styled(InvoiceItemDetail)`
@@ -81,15 +116,31 @@ const InvoiceFooter = styled.div`
     grid-gap: 10px;
     padding: 10px 20px;
     border-top: 2px solid ${Colors.DARKEN};
-    grid-template-columns: 4fr 3fr 1fr;
+    grid-template-areas: "left left left left label label label value";
     font-size: 1.3rem;
     text-align: right;
+
+    @media (max-width: ${MD}px) {
+        grid-template-areas: "label value";
+        padding-left: 0;
+    }
 `
 
 const ActionContainer = styled.div`
     display: flex;
     > :not(:last-child) {
         margin-right: 5px;
+    }
+    
+    @media (max-width: ${MD}px) {
+        flex-direction: column;
+
+        > * {
+            margin-top: 10px;
+        }
+        > :not(:last-child) {
+            margin-right: 0;
+        }
     }
 `
 
@@ -152,7 +203,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
                         <b>Description:</b> {invoiceCalc.description}
                     </div>
                     <div>
-                        <b>From:</b> {invoiceCalc.ownerAddress}
+                        <b>From:</b> <AddressLink showAddressText={false} address={invoiceCalc.ownerAddress} />
                     </div>
                     <div>
                         <b>To:</b> {invoiceCalc.payerAddress}
@@ -207,15 +258,12 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
                 </InvoicePayments>
             )}
             <InvoiceFooter>
-                <div />
-                <b>Total:</b>
+                <b style={{gridColumn: 'label'}}>Total:</b>
                 <b>{formatter(invoiceCalc?.originalOwed || 0)}</b>
-                <div />
-                <b>Payments:</b>
+                <b style={{gridColumn: 'label'}}>Payments:</b>
                 <b>{invoiceCalc?.paymentSum > 0 ? "- " : ""}{formatter(invoiceCalc?.paymentSum || 0)}</b>
-                <div style={{borderBottom: '2px solid grey', gridColumn: '2/4' }} />
-                <div />
-                <b>Amount Due:</b>
+                <div style={{borderBottom: '2px solid grey', gridColumn: 'label / value' }} />
+                <b style={{gridColumn: 'label'}}>Amount Due:</b>
                 <div><b>{formatter(invoiceCalc?.remainingOwed || 0)}</b></div>
             </InvoiceFooter>
         </FormWrapper>

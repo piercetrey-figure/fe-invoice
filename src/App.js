@@ -7,7 +7,7 @@ import {
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import styled from "styled-components";
 import { Connect, Disconnect, Popup } from "Components";
-import { ROOT_NAME } from "consts";
+import { LG, ROOT_NAME } from "consts";
 import { REACT_APP_WCJS_VERSION } from "./version"; // eslint-disable-line
 import { useWallet } from "@provenanceio/wallet-lib";
 import { TEXT_ACCENT, PRIMARY_BACKGROUND, TEXT } from "./consts/colors";
@@ -39,6 +39,17 @@ const WalletConnectVersion = styled.div`
   position: absolute;
   bottom: 10px;
   left: 10px;
+
+  @media (max-width: ${LG}px) {
+    left: 20px;
+    color: ${TEXT};
+  }
+`;
+
+const Logo = styled(Header)`
+  @media (max-width: ${LG}px) {
+    margin: 0 0 20px 0;
+  }
 `;
 
 export const App = () => {
@@ -114,7 +125,7 @@ export const App = () => {
           <SidebarLayout
             sidebarContent={
               <>
-                <Header>InVoice</Header>
+                <Logo>InVoice</Logo>
                 {connected ? (
                   <>
                     <SidebarLink to="/">My Invoices</SidebarLink>

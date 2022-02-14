@@ -1,6 +1,6 @@
 import { FunctionComponent, ReactChild } from "react";
 import styled from "styled-components";
-import { Colors } from 'consts';
+import { Colors, SM } from 'consts';
 
 export interface FormWrapperProps {
     title: string,
@@ -30,11 +30,20 @@ const HeaderRow = styled.div`
     &:not(:last-child) {
         margin-bottom: 20px;
     }
+
+    @media (max-width: ${SM}px) {
+        flex-direction: column;
+        align-items: unset;
+    }
 `
 
 const Title = styled.div`
     font-size: 3em;
     font-weight: bold;
+
+    @media (max-width: ${SM}px) {
+        margin-bottom: 10px;
+    }
 `
 
 const Action = styled.div``

@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { TitleHeader } from "../../Headers";
 import { calculateTotal, currencyFormatter, enumStringToHumanReadable, invoiceTotal } from "../../../util";
 import { Search } from "../../Search";
-import { Colors } from 'consts';
+import { Colors, MD, SM } from 'consts';
 import { Link, useNavigate } from 'react-router-dom'
 import { ListFilters, ToggleFilter } from "Components/Filters";
 import { InvoiceWithCalc } from "models";
@@ -18,6 +18,11 @@ const TotalDetails = styled.div`
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+
+    @media (max-width: ${MD}px) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 `
 
 const InvoiceTable = styled.div`
@@ -36,9 +41,10 @@ const TableElement = styled.div`
 
 const InvoiceRowWrapper = styled.div`
     display: grid;
+    grid-gap: 10px;
     grid-template-columns: repeat(5, 1fr);
     border-top: 1px solid black;
-    padding: 10px;
+    padding: 10px 0;
     align-items: center;
 
     color: ${Colors.TEXT};
@@ -49,6 +55,25 @@ const InvoiceRowWrapper = styled.div`
     > *:last-child {
         display: flex;
         justify-content: flex-end;
+        text-align: right;
+    }
+
+    @media (max-width: ${MD}px) {
+        grid-template-columns: repeat(4, 1fr);
+
+        > :nth-child(3) {
+            display: none;
+        }
+    }
+
+    @media (max-width: ${SM}px) {
+        grid-template-columns: 1fr 1fr;
+
+        > :nth-child(2) {
+            display: flex;
+            justify-content: flex-end;
+            text-align: right;
+        }
     }
 `
 

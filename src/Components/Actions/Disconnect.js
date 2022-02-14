@@ -4,12 +4,16 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Button } from "Components";
 import { ActionContainer } from "./ActionContainer";
-import { Colors } from "consts";
+import { Colors, SM } from "consts";
 
 const Info = styled.div`
   font-size: 1.4rem;
   margin-right: 40px;
   flex-basis: 80%;
+  @media (max-width: ${SM}px) {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
 `;
 export const Disconnect = ({ walletConnectService, setPopup }) => {
   const color = Colors.WARN;

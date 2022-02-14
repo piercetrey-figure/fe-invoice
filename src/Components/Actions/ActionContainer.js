@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
+import { LG, MD, SM } from "consts";
 
 const Container = styled.div`
   padding: 20px;
@@ -12,6 +13,15 @@ const Container = styled.div`
   align-items: center;
   justify-content: ${({ justify }) => justify};
   ${({ noMargin }) => !noMargin && "margin-bottom: 30px;"}
+
+  @media(max-width: ${LG}px) {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: ${SM}px) {
+    flex-direction: column;
+    padding: 10px;
+  }
 `;
 
 export const ActionContainer = ({
