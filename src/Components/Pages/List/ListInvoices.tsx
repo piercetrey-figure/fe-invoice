@@ -44,7 +44,7 @@ const InvoiceRowWrapper = styled.div`
     grid-gap: 10px;
     grid-template-columns: repeat(5, 1fr);
     border-top: 1px solid black;
-    padding: 10px 0;
+    padding: 10px;
     align-items: center;
 
     color: ${Colors.TEXT};
