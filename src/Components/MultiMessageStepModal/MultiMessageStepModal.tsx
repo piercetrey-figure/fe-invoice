@@ -24,7 +24,7 @@ export function parseSignMessage<T extends Message>(anyProto: any, deserializer:
 }
 
 export interface MultiMessageStepModalProps {
-    messages: SignMessage[],
+    messages: SignMessage[][],
     onComplete?: () => any,
 }
 
@@ -34,16 +34,16 @@ export const MultiMessageStepModal: FunctionComponent<MultiMessageStepModalProps
 
     const { walletConnectService: wcs } = useWalletConnect()
 
-    const handleSign = async (message: SignMessage) => await wcs.customAction({
-        message: Buffer.from(new Any().setTypeUrl(message.anyProto.typeUrl).setValue(message.anyProto.value).serializeBinary()).toString('base64'),
-        description: message.anyProto.typeUrl,
-        method: "provenance_sendTransaction",
+    const handleSign = async (batch: SignMessage[]) => await wcs.customAction({
+        message: batch.map(message => Buffer.from(new Any().setTypeUrl(message.anyProto.typeUrl).setValue(message.anyProto.value).serializeBinary()).toString('base64')),
+        description: batch.map(message => message.anyProto.typeUrl).join(),
+        method: 'provenance_sendTransaction',
     })
 
     useEffect(() => {
         (async () => {
-            for (const message of messages) {
-                await handleSign(message)
+            for (const batch of messages) {
+                await handleSign(batch)
                 setCurrent(c => Math.min(c + 1, messages.length - 1))
             }
             onComplete && onComplete()
@@ -55,8 +55,8 @@ export const MultiMessageStepModal: FunctionComponent<MultiMessageStepModalProps
     }
 
     return <Modal>
-        <Header>Sign Message ({current + 1} / {messages.length})</Header>
-        <pre>{JSON.stringify(messages[current].proto, null, 2)}</pre>
+        <Header>Sign Transaction ({current + 1} / {messages.length})</Header>
+        <pre>{JSON.stringify(messages[current].map(message => message.proto), null, 2)}</pre>
         <SubHeader>Please Check Your Device for Signature Prompt</SubHeader>
     </Modal>
 }

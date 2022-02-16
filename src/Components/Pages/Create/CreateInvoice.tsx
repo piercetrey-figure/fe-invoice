@@ -53,7 +53,7 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
     const [reviewing, setReviewing] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const [signing, setSigning] = useState(false)
-    const [messages, setMessages] = useState<SignMessage[]>([])
+    const [messages, setMessages] = useState<SignMessage[][]>([])
     const [handleComplete, setHandleComplete] = useState(() => () => navigate('/'))
     const [error, setError] = useState('')
 
@@ -121,12 +121,12 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
 
             const invoiceContractService = new InvoiceContractService(ROOT_PAYABLE_NAME)
 
-            setMessages([
+            setMessages([[
                 parseSignMessage(createResult.scopeGenerationDetail.writeScopeRequest, MsgWriteScopeRequest.deserializeBinary),
                 parseSignMessage(createResult.scopeGenerationDetail.writeSessionRequest, MsgWriteSessionRequest.deserializeBinary),
                 parseSignMessage(createResult.scopeGenerationDetail.writeRecordRequest, MsgWriteRecordRequest.deserializeBinary),
                 parseSignMessage({typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: await invoiceContractService.generateCreateInvoiceBase64Message(createResult.payablesContractExecutionDetail, address)}, MsgExecuteContract.deserializeBinary),
-            ])
+            ]])
             setHandleComplete(() => () => navigate(`/invoices/${invoice?.getInvoiceUuid()?.getValue()}`))
 
             setSigning(true)

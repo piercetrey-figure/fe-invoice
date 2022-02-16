@@ -152,7 +152,7 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
     const { uuid } = useParams()
     const { data: invoiceCalc, isError, isLoading, refetch: refreshInvoice, } = useGetCalc(uuid || '')
     const [paymentOpen, setPaymentOpen] = useState(false)
-    const [messages, setMessages] = useState<SignMessage[]>([])
+    const [messages, setMessages] = useState<SignMessage[][]>([])
 
     const { walletConnectState: { address } } = useWalletConnect()
 
@@ -178,9 +178,9 @@ export const InvoiceDetails: FunctionComponent<InvoiceDetailsProps> = ({ }) => {
 
         const message = await service.generateMakePaymentBase64Message(invoiceCalc?.uuid || '', amount, paymentDenom, address)
 
-        setMessages([
+        setMessages([[
             parseSignMessage({ typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: message }, MsgExecuteContract.deserializeBinary)
-        ])
+        ]])
     }
 
     const handleCompletedPayment = () => {
