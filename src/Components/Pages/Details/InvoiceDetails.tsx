@@ -10,7 +10,7 @@ import { enumStringToHumanReadable, currencyFormatter } from "../../../util";
 import { Button } from 'Components';
 import { PaymentModal } from 'Components/PaymentModal';
 import { MultiMessageStepModal, parseSignMessage, SignMessage } from 'Components/MultiMessageStepModal';
-import { InvoiceContractService } from 'Services';
+import { InvoiceContractService } from 'services';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb';
 import {LineItemCalc, PaymentCalc} from "../../../models/InvoiceCalc";

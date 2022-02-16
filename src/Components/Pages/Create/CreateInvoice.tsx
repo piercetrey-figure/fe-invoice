@@ -20,7 +20,7 @@ import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { MultiMessageStepModal, parseSignMessage, SignMessage } from "Components/MultiMessageStepModal";
 import { MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest } from '@provenanceio/wallet-lib/lib/proto/provenance/metadata/v1/tx_pb'
 import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb';
-import { InvoiceContractService } from "Services";
+import { InvoiceContractService } from "services";
 import { INVOICE_DATE_FORMAT, ROOT_PAYABLE_NAME } from "consts";
 import { useGetDenoms } from "hooks";
 

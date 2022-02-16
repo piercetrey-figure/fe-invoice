@@ -8,7 +8,7 @@ import {
     SearchNamesQueryResponse,
     SearchNamesRequest,
 } from 'models';
-import { WasmService } from 'Services';
+import { WasmService } from 'services';
 import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb'
 import { Coin } from '@provenanceio/wallet-lib/lib/proto/cosmos/base/v1beta1/coin_pb'
 import { Any } from '@provenanceio/wallet-lib/lib/proto/google/protobuf/any_pb'

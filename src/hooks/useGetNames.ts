@@ -1,6 +1,6 @@
 import { ROOT_NAME } from "consts"
 import { useQuery } from "react-query"
-import { NameContractService } from "Services/NameContractService"
+import { NameContractService } from "services/NameContractService"
 
 export const useGetNames = (address: string) => {
     const nameService = new NameContractService(ROOT_NAME)
