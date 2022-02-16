@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/fe-invoice/static/css/main.6faa5ce6.chunk.css",
-    "main.js": "/fe-invoice/static/js/main.2d1d693f.chunk.js",
-    "main.js.map": "/fe-invoice/static/js/main.2d1d693f.chunk.js.map",
+    "main.js": "/fe-invoice/static/js/main.71dea01b.chunk.js",
+    "main.js.map": "/fe-invoice/static/js/main.71dea01b.chunk.js.map",
     "runtime-main.js": "/fe-invoice/static/js/runtime-main.f14e6956.js",
     "runtime-main.js.map": "/fe-invoice/static/js/runtime-main.f14e6956.js.map",
-    "static/js/2.3879a536.chunk.js": "/fe-invoice/static/js/2.3879a536.chunk.js",
-    "static/js/2.3879a536.chunk.js.map": "/fe-invoice/static/js/2.3879a536.chunk.js.map",
+    "static/js/2.e4d079e9.chunk.js": "/fe-invoice/static/js/2.e4d079e9.chunk.js",
+    "static/js/2.e4d079e9.chunk.js.map": "/fe-invoice/static/js/2.e4d079e9.chunk.js.map",
     "index.html": "/fe-invoice/index.html",
     "static/css/main.6faa5ce6.chunk.css.map": "/fe-invoice/static/css/main.6faa5ce6.chunk.css.map",
-    "static/js/2.3879a536.chunk.js.LICENSE.txt": "/fe-invoice/static/js/2.3879a536.chunk.js.LICENSE.txt",
+    "static/js/2.e4d079e9.chunk.js.LICENSE.txt": "/fe-invoice/static/js/2.e4d079e9.chunk.js.LICENSE.txt",
     "static/media/figure.ee230eb1.svg": "/fe-invoice/static/media/figure.ee230eb1.svg",
     "static/media/provenance.16cb133f.svg": "/fe-invoice/static/media/provenance.16cb133f.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.f14e6956.js",
-    "static/js/2.3879a536.chunk.js",
+    "static/js/2.e4d079e9.chunk.js",
     "static/css/main.6faa5ce6.chunk.css",
-    "static/js/main.2d1d693f.chunk.js"
+    "static/js/main.71dea01b.chunk.js"
   ]
 }
