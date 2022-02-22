@@ -6,6 +6,7 @@ export interface PayablesContractExecutionDetail {
     payableType: string,
     payableUuid: string,
     scopeId: string,
+    oracleAddress: string,
     invoiceDenom: string,
     invoiceTotal: number,
 }

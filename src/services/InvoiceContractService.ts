@@ -36,15 +36,17 @@ export class InvoiceContractService {
             this.getContractAddress(),
             this.getContractConfig()
         ])
+        const messageJson = new RegisterPayable()
+            .setPayableType(contractDetail.payableType)
+            .setPayableUuid(contractDetail.payableUuid)
+            .setScopeId(contractDetail.scopeId)
+            .setOracleAddress(contractDetail.oracleAddress)
+            .setPayableDenom(contractDetail.invoiceDenom)
+            .setPayableTotal(`${contractDetail.invoiceTotal}`)
+            .toJson();
+        console.log(messageJson);
         const message = new MsgExecuteContract()
-            .setMsg(Buffer.from(new RegisterPayable()
-                .setPayableType(contractDetail.payableType)
-                .setPayableUuid(contractDetail.payableUuid)
-                .setScopeId(contractDetail.scopeId)
-                .setPayableDenom(contractDetail.invoiceDenom)
-                .setPayableTotal(`${contractDetail.invoiceTotal}`)
-                .toJson()
-            , 'utf-8').toString('base64'))
+            .setMsg(Buffer.from(messageJson, 'utf-8').toString('base64'))
             .setFundsList([new Coin().setAmount(contractConfig.onboarding_cost).setDenom(contractConfig.onboarding_denom)])
             .setContract(contractAddr)
             .setSender(address);
