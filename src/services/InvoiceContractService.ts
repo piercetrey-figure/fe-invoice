@@ -41,10 +41,10 @@ export class InvoiceContractService {
                 .setPayableType(contractDetail.payableType)
                 .setPayableUuid(contractDetail.payableUuid)
                 .setScopeId(contractDetail.scopeId)
+                .setOracleAddress(contractDetail.oracleAddress)
                 .setPayableDenom(contractDetail.invoiceDenom)
                 .setPayableTotal(`${contractDetail.invoiceTotal}`)
-                .toJson()
-            , 'utf-8').toString('base64'))
+                .toJson(), 'utf-8').toString('base64'))
             .setFundsList([new Coin().setAmount(contractConfig.onboarding_cost).setDenom(contractConfig.onboarding_denom)])
             .setContract(contractAddr)
             .setSender(address);
@@ -65,7 +65,7 @@ export class InvoiceContractService {
             .setMsg(Buffer.from(new MakePayment()
                 .setPayableUuid(payableUuid)
                 .toJson()
-            , 'utf-8').toString('base64'))
+                , 'utf-8').toString('base64'))
             .setFundsList([new Coin().setAmount(`${amount}`).setDenom(paymentDenom)])
             .setContract(contractAddr)
             .setSender(address);

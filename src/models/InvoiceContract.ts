@@ -15,8 +15,8 @@ export interface QueryInvoiceSettingsResponse {
     fee_collection_address: string,
     // Percentage of each transaction that is taken as fee
     fee_percent: string, // i.e. '0.5'
-    // Address of the oracle application that can withdraw excess fees after fee percent is removed from onboarding_cost
-    oracle_address: string,
+    // Whether or not the contract is running in 'local' mode
+    is_local: boolean,
 }
 
 export class QueryPayableState {
@@ -52,12 +52,14 @@ export class RegisterPayable extends ContractMsg {
         payable_type: string,
         payable_uuid: string,
         scope_id: string,
+        oracle_address: string,
         payable_denom: string,
         payable_total: string,
     } = {
         payable_type: '',
         payable_uuid: '',
         scope_id: '',
+        oracle_address: '',
         payable_denom: '',
         payable_total: '',
     }
@@ -74,6 +76,11 @@ export class RegisterPayable extends ContractMsg {
 
     setScopeId(scope_id: string): RegisterPayable {
         this.register_payable.scope_id = scope_id
+        return this
+    }
+
+    setOracleAddress(oracle_address: string): RegisterPayable {
+        this.register_payable.oracle_address = oracle_address
         return this
     }
 
