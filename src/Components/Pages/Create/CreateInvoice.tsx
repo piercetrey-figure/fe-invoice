@@ -126,6 +126,7 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
                 parseSignMessage(createResult.scopeGenerationDetail.writeSessionRequest, MsgWriteSessionRequest.deserializeBinary),
                 parseSignMessage(createResult.scopeGenerationDetail.writeRecordRequest, MsgWriteRecordRequest.deserializeBinary),
             ], [
+                // TODO: add this back into the other bulk transaction once attributes can be added to scopes that are created in the same transaction group
                 parseSignMessage({typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: await invoiceContractService.generateCreateInvoiceBase64Message(createResult.payablesContractExecutionDetail, address)}, MsgExecuteContract.deserializeBinary),
             ]])
             setHandleComplete(() => () => navigate(`/invoices/${invoice?.getInvoiceUuid()?.getValue()}`))
