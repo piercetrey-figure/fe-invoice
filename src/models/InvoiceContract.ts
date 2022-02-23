@@ -15,8 +15,8 @@ export interface QueryInvoiceSettingsResponse {
     fee_collection_address: string,
     // Percentage of each transaction that is taken as fee
     fee_percent: string, // i.e. '0.5'
-    // Address of the oracle application that can withdraw excess fees after fee percent is removed from onboarding_cost
-    oracle_address: string,
+    // Whether or not the contract is running in 'local' mode
+    is_local: boolean,
 }
 
 export class QueryPayableState {
