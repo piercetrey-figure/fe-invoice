@@ -20,9 +20,11 @@ import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { MultiMessageStepModal, parseSignMessage, SignMessage } from "Components/MultiMessageStepModal";
 import { MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest } from '@provenanceio/wallet-lib/lib/proto/provenance/metadata/v1/tx_pb'
 import { MsgExecuteContract } from '@provenanceio/wallet-lib/lib/proto/cosmwasm/wasm/v1/tx_pb';
-import { InvoiceContractService } from "services";
-import { INVOICE_DATE_FORMAT, ROOT_PAYABLE_NAME } from "consts";
+import { AssetClassificationContractService, InvoiceContractService } from "services";
+import { INVOICE_DATE_FORMAT, ROOT_ASSET_CLASSIFICATION_NAME, ROOT_PAYABLE_NAME } from "consts";
 import { useGetDenoms } from "hooks";
+import { AssetVerifierSelector } from "Components/AssetVerifier";
+import { useAssetVerifiers } from "hooks/useAssetVerifiers";
 
 interface TermsSelectorProps {
     value?: string,
@@ -56,6 +58,7 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
     const [messages, setMessages] = useState<SignMessage[][]>([])
     const [handleComplete, setHandleComplete] = useState(() => () => navigate('/'))
     const [error, setError] = useState('')
+    const { data: assetVerifiers } = useAssetVerifiers()
 
     const { walletConnectState: { address } } = useWalletConnect()
 
@@ -116,10 +119,13 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
                     .setQuantity(lineItem.quantity)
                     .setPrice(newDecimal(lineItem.price))
                 ))
+
+            const selectedVerifier = (assetVerifiers || []).find(verifier => verifier.address === data.verifier)
                 
             const createResult = await onCreate(invoice)
 
             const invoiceContractService = new InvoiceContractService(ROOT_PAYABLE_NAME)
+            const assetClassificationContractService = new AssetClassificationContractService(ROOT_ASSET_CLASSIFICATION_NAME)
 
             setMessages([[
                 parseSignMessage(createResult.scopeGenerationDetail.writeScopeRequest, MsgWriteScopeRequest.deserializeBinary),
@@ -128,7 +134,8 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
             ], [
                 // TODO: add this back into the other bulk transaction once attributes can be added to scopes that are created in the same transaction group
                 parseSignMessage({typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: await invoiceContractService.generateCreateInvoiceBase64Message(createResult.payablesContractExecutionDetail, address)}, MsgExecuteContract.deserializeBinary),
-            ]])
+                selectedVerifier && parseSignMessage({typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract', value: await assetClassificationContractService.generateClassifyAssetBase64Message(createResult.payablesContractExecutionDetail, selectedVerifier, address)}, MsgExecuteContract.deserializeBinary),
+            ].filter(m => !!m) as SignMessage[]])
             setHandleComplete(() => () => navigate(`/invoices/${invoice?.getInvoiceUuid()?.getValue()}`))
 
             setSigning(true)
@@ -146,6 +153,7 @@ export const CreateInvoice: FunctionComponent<CreateInvoiceProps> = ({ }) => {
             <FormProvider {...formMethods}>
                 <form onSubmit={e => e.preventDefault()}>
                     <VendorSelector required disabled={reviewing} />
+                    <AssetVerifierSelector required disabled={reviewing} />
                     <FormRow columns={2}>
                         <Input type="date" required disabled={reviewing} label="Invoice Date" name="invoice_date"></Input>
                         <TermsSelector required disabled={reviewing} />

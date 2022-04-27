@@ -2,6 +2,7 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Colors } from "consts";
 import { useFormContext } from "react-hook-form";
+import { FunctionComponent, SelectHTMLAttributes } from "react";
 
 const Container = styled.div`
   margin-bottom: 10px;
@@ -20,7 +21,7 @@ const SelectContainer = styled.div`
   position: relative;
   width: 100%;
 `;
-const StyledSelect = styled.select`
+const StyledSelect = styled.select<SelectHTMLAttributes<HTMLSelectElement> & { type?: string }>`
   width: 100%;
   padding: 11px 18px;
   border-radius: 4px;
@@ -63,20 +64,49 @@ const Label = styled.label`
   color: #333333;
 `;
 
-const Dropdown = ({
+
+type DropdownOption = string | DetailedDropdownOption
+
+interface DetailedDropdownOption {
+  display: string,
+  key: string,
+  value: string,
+}
+
+function parseOption(value: DropdownOption): DetailedDropdownOption {
+  if (typeof value === 'string') {
+    return {
+      display: value,
+      key: value,
+      value,
+    }
+  }
+  return value
+}
+
+export interface DropdownProps {
+  className?: string,
+  label?: string,
+  options: DropdownOption[],
+  name: string,
+  onChange?: (value: any) => any,
+  disabled?: boolean,
+  required?: boolean | string,
+}
+
+const Dropdown: FunctionComponent<DropdownProps> = ({
   className,
   label,
   options,
   name,
-  value,
   onChange,
   disabled,
   required,
 }) => {
   const renderOptions = () =>
-    options.map((title, index) => (
-      <option key={title} value={title} disabled={index === 0}>
-        {title}
+    options.map(parseOption).map((option, index) => (
+      <option key={option.key} value={option.value} disabled={index === 0}>
+        {option.display}
       </option>
     ));
 
@@ -89,7 +119,7 @@ const Dropdown = ({
           {label && <Label htmlFor={name}>{label}</Label>}
           <StyledSelect
             {...register(name, { required })}
-            onChange={({ target }) => onChange(target.value)}
+            onChange={({ target }) => onChange && onChange(target.value)}
             disabled={disabled}
           >
             {renderOptions()}
@@ -105,7 +135,6 @@ Dropdown.propTypes = {
   className: PropTypes.string,
   label: PropTypes.string,
   options: PropTypes.array.isRequired,
-  value: PropTypes.node,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   disabled: PropTypes.bool,
@@ -114,7 +143,6 @@ Dropdown.propTypes = {
 Dropdown.defaultProps = {
   className: "",
   label: "",
-  value: null,
   disabled: false,
   onChange: () => {},
   required: false,
