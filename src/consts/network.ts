@@ -11,7 +11,7 @@ export const FEE_DENOM = 'nhash'
 export const BASE_URL = 'https://test.figure.tech/service-invoice/v1'
 export const ROOT_PAYABLE_NAME = 'payablestest18.pb'
 
-export const ROOT_ASSET_CLASSIFICATION_NAME = 'testassets.pb'
+export const ROOT_ASSET_CLASSIFICATION_NAME = 'assetclassificationalias.pb'
 export const PAYABLE_ASSET_TYPE = 'payable'
 export const ACCESS_ROUTE = PRODUCTION ? 'grpcs://figure.tech' : 'grpcs://test.figure.tech'
 export const ACCESS_ROUTE_NAME = 'gateway'
