@@ -53,14 +53,14 @@ export interface VerifierDetail {
     address: string,
     onboarding_cost: string,
     onboarding_denom: string,
-    fee_percent: number,
     fee_destinations: FeeDestination[],
     entity_detail?: EntityDetail,
 }
 
 export interface FeeDestination {
     address: string,
-    fee_percent: number,
+    fee_amount: number,
+    entity_detail?: EntityDetail,
 }
 
 export interface EntityDetail {
