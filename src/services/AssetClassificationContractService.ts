@@ -35,7 +35,7 @@ export class AssetClassificationContractService {
                 .setVerifierAddress(verifier.address)
                 .addAccessRoute(ACCESS_ROUTE, ACCESS_ROUTE_NAME)
                 .toJson(), 'utf-8').toString('base64'))
-            .setFundsList([new Coin().setAmount(verifier.onboarding_cost).setDenom(verifier.onboarding_denom)])
+            .setFundsList([])
             .setContract(contractAddr)
             .setSender(address);
         // Directly hardcoded from https://github.com/CuCreekCo/ProvenanceWalletConnect/blob/d2227d716ddb3f95783624b50e0e70220e33a858/ProvenanceWalletConnect/Handlers/WalletConnectHandlers.swift#L408
