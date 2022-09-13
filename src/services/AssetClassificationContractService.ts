@@ -23,7 +23,7 @@ export class AssetClassificationContractService {
     }
 
     async getInvoiceAssetDefinition(): Promise<QueryAssetDefinitionResponse> {
-        return this.wasmService.queryWasmCustom<QueryAssetDefinition, QueryAssetDefinitionResponse>(await this.getContractAddress(), QueryAssetDefinition.fromAssetType(PAYABLE_ASSET_TYPE))
+        return this.wasmService.queryWasmCustom<QueryAssetDefinition, QueryAssetDefinitionResponse>(await this.getContractAddress(), new QueryAssetDefinition().setAssetType(PAYABLE_ASSET_TYPE))
     }
 
     async generateClassifyAssetBase64Message(contractDetail: PayablesContractExecutionDetail, verifier: VerifierDetail, address: string): Promise<string> {

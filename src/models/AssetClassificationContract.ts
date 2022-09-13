@@ -2,49 +2,17 @@ import { ContractMsg } from "./ContractBase"
 
 export class QueryAssetDefinition {
     public query_asset_definition: {
-        qualifier?: AssetQualifier
+        asset_type?: string
     } = {}
 
-    static fromAssetType(asset_type: string): QueryAssetDefinition {
-        return new QueryAssetDefinition().setAssetType(asset_type)
-    }
-
-    static fromScopeSpecAddress(scope_spec_address: string): QueryAssetDefinition {
-        return new QueryAssetDefinition().setScopeSpecAddress(scope_spec_address)
-    }
-
     setAssetType(asset_type: string): QueryAssetDefinition {
-        this.query_asset_definition.qualifier = {
-            type: 'asset_type',
-            value: asset_type,
-        }
+        this.query_asset_definition.asset_type = asset_type
         return this
     }
-
-    setScopeSpecAddress(scope_spec_address: string): QueryAssetDefinition {
-        this.query_asset_definition.qualifier = {
-            type: 'scope_spec_address',
-            value: scope_spec_address,
-        }
-        return this
-    }
-}
-
-export type AssetQualifier = AssetTypeAssetQualifier | ScopeSpecAddressAssetQualifier
-
-export interface AssetTypeAssetQualifier {
-    type: 'asset_type',
-    value: string
-}
-
-export interface ScopeSpecAddressAssetQualifier {
-    type: 'scope_spec_address',
-    value: string
 }
 
 export interface QueryAssetDefinitionResponse {
     asset_type: string,
-    scope_spec_address: string,
     verifiers: VerifierDetail[],
     enabled: boolean,
 }
